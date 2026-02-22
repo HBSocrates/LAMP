@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import './App.css'
-import './mathOperands.js'
-import { operandsList } from './mathOperands.js';
+import '../App.css'
+import '../mathOperands.js'
+import { operandsList } from '../mathOperands.js';
 
 function MathGameApp() {
   let operandNum = 0;

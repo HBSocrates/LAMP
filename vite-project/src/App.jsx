@@ -1,26 +1,30 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import mathLogo from './assets/Math.svg'
-import './App.css'
+import React from "react";
+import "./App.css";
+import Navbar from "./components/Navbar";
+import {
+    BrowserRouter as Router,
+    Routes,
+    Route,
+} from "react-router-dom";
+import Home from "./pages";
+import About from "./pages/about";
+import Events from "./pages/events";
+import AnnualReport from "./pages/annual";
+import Teams from "./pages/team";
+import Blogs from "./pages/blogs";
+import MathGameApp from "./pages/MathGameApp";
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
-    <>
-      <div>
-        <a href="/mathapp.html">
-          <img src={mathLogo} className="logo math" alt="Math logo" />
-        </a>
-      </div>
-      <h1>Andy Yang</h1>
-      <div className="card">
-        <p>
-          Welcome to my site! Click the pi symbol above to play a fun math game!
-        </p>
-      </div>
-    </>
+        <Router>
+            <Navbar />
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/mathApp" element={<MathGameApp />} />
+                <Route path="/about" element={<About />} />
+            </Routes>
+        </Router>
   )
 }
 
