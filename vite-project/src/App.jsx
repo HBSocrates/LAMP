@@ -1,14 +1,14 @@
 import React from "react";
 import "./App.css";
+import Home from "./pages";
+import About from "./pages/about";
+import MathGameApp from "./pages/MathGameApp";
 import Navbar from "./components/Navbar/index.jsx";
 import {
     BrowserRouter as Router,
     Routes,
     Route,
 } from "react-router-dom";
-import Home from "./pages";
-import About from "./pages/about";
-import MathGameApp from "./pages/MathGameApp";
 
 function App() {
 
