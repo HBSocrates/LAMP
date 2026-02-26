@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import '../App.css'
+import '../styles/App.css'
 import '../mathOperands.js'
+import AccordionMenu from '../components/AccordianMenu/AccordianMenu.jsx';
 import { operandsList } from '../mathOperands.js';
 
 function MathGameApp() {
