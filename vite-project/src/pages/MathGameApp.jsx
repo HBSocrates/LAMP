@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import '../styles/App.css'
 import '../mathOperands.js'
-import AccordionMenu from '../components/AccordianMenu/AccordianMenu.jsx';
 import { operandsList } from '../mathOperands.js';
 
-function MathGameApp() {
+function MathGameApp(props) {
   let operandNum = 0;
   let highScore = localStorage.getItem('highScore') ? localStorage.getItem('highScore') : 0;
 
@@ -36,6 +35,22 @@ function MathGameApp() {
       localStorage.setItem('max', event.target.value);
       setMax(event.target.value);
     }
+  }
+
+  const submitSettingButton = (event) => {
+    localStorage.setItem('min', document.getElementsByName('min')[0].value);
+    localStorage.setItem('max', document.getElementsByName('max')[0].value);
+    setMin(document.getElementsByName('min')[0].value);
+    setMax(document.getElementsByName('max')[0].value);
+  }
+
+  const resetButton = (event) => {
+    localStorage.setItem('min', -12);
+    localStorage.setItem('max', 12);
+    setMin(-12);
+    setMax(12);
+    document.getElementsByName('min')[0].value = -12;
+    document.getElementsByName('max')[0].value = 12;
   }
 
   function validateSolution() {
@@ -97,32 +112,19 @@ function MathGameApp() {
         <p>{response}</p>
       </div>
       <div>
-          <h2>Settings</h2>
-          <label>
-            Min:
-            <input name="min" type="number" defaultValue={localStorage.getItem('min') ? localStorage.getItem('min') : -12} onKeyDown={minKeyPressed}/> <br></br>
-            Max:
-            <input name="max" type="number" defaultValue={localStorage.getItem('max') ? localStorage.getItem('max') : 12} onKeyDown={maxKeyPressed}/> <br></br>
-            <button name="submit" onClick={() => {
-              localStorage.setItem('min', document.getElementsByName('min')[0].value);
-              localStorage.setItem('max', document.getElementsByName('max')[0].value);
-              setMin(document.getElementsByName('min')[0].value);
-              setMax(document.getElementsByName('max')[0].value);
-            }}> Submit </button>
-            <br></br>
-            <button name="reset" onClick={() => {
-              localStorage.setItem('min', -12);
-              localStorage.setItem('max', 12);
-              setMin(-12);
-              setMax(12);
-              document.getElementsByName('min')[0].value = -12;
-              document.getElementsByName('max')[0].value = 12;
-            }}> Reset </button>
-          </label>
+        <h2>Settings</h2>
+        <label>
+          Min:
+          <input name="min" type="number" defaultValue={localStorage.getItem('min') ? localStorage.getItem('min') : -12} onKeyDown={minKeyPressed}/> <br></br>
+          Max:
+          <input name="max" type="number" defaultValue={localStorage.getItem('max') ? localStorage.getItem('max') : 12} onKeyDown={maxKeyPressed}/> <br></br>
+          <button name="submit" onClick={() => {submitSettingButton()}}> Submit </button>
+          <br></br>
+          <button name="reset" onClick={() => {resetButton()}}> Reset </button>
+        </label>
       </div>
     </>
   )
 }
 
 export default MathGameApp
-

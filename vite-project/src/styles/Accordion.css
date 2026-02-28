@@ -6,7 +6,6 @@
   padding: 50px 30px;
   border-radius: 15px;
   border: 1px solid #bdbdbd;
-  background-color: white;
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   width: auto;
 }
@@ -16,17 +15,15 @@ h1.title {
   justify-content: center;
   align-items: center;
   width: 600px;
-  color: #2f80ed;
-  font-size: 24px;
-  font-weight: 500;
+  font-size: 40px;
+  color: white;
 }
 
 .accordion-items {
   display: flex;
   flex-direction: column;
-  padding-top: 20px;
   align-items: flex-start;
-  gap: 15px;
+  white-space: pre-line;
 }
 
 .accordion-item {
@@ -37,33 +34,26 @@ h1.title {
   padding: 20px;
   border-radius: 15px;
   padding-left: 72px;
-  background-color: white;
   cursor: pointer;
   transition: 0.25s background-color;
 }
 
-.accordion-item.active {
-  background-color: #f2f8fe;
-}
-
 h1.accordion-tile {
-  color: #000;
-  font-size: 16px;
+  font-size: 24px;
   font-weight: 500;
 }
 
 p.accordion-content {
   max-height: 0;
   overflow: hidden;
-  color: #000;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 300;
   margin: 0;
   transition: 0.5s max-height, 0.5s margin;
 }
 
 p.accordion-content.active {
-  max-height: 2rem;
+  max-height: 20rem;
   margin: 1rem 0;
 }
 
@@ -80,7 +70,6 @@ p.accordion-content.active {
 }
 
 .icon-container.active {
-  background-color: white;
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
 }
 
@@ -95,7 +84,7 @@ p.accordion-content.active {
 .stroke-one {
   width: 3px;
   height: 12px;
-  background-color: #000;
+  background-color: white;
   transform: translateX(calc(12px / 2 - 1.5px)) rotate(0deg);
 }
 
@@ -106,6 +95,6 @@ p.accordion-content.active {
 .stroke-two {
   height: 3px;
   width: 12px;
-  background-color: #000;
+  background-color: white;
   transform: translateY(calc(-12px / 2 - 1.5px));
 }
