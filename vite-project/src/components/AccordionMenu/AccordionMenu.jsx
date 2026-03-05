@@ -7,7 +7,6 @@ const AccordionMenu = ({titles = [], contents = [], name}) => {
   // Make sure we have the same number of titles and contents before we try to create the accordion items
   // Then we map through all the titles and create an accordion item for each title, using the corresponding content from the contents array
   let accordionItems = [];
-  console.log(`hi! ${titles.length}`);
   if (titles.length === contents.length) {
     accordionItems = titles.map((item, index) => {
       return (
@@ -22,6 +21,7 @@ const AccordionMenu = ({titles = [], contents = [], name}) => {
     });
   }
 
+  // Function to collapse/expand accordion items by setting the currently active item to the index of the clicked item, or null if the clicked item is already active
   const handleAccordionClick = (newActiveAccordion) => {
     setCurrentlyActive(
       newActiveAccordion === currentlyActive ? null : newActiveAccordion

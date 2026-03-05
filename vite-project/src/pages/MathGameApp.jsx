@@ -17,12 +17,14 @@ function MathGameApp(props) {
   const [min, setMin] = useState(localStorage.getItem('min') ? localStorage.getItem('min') : -12);
   const [max, setMax] = useState(localStorage.getItem('max') ? localStorage.getItem('max') : 12);
 
+  // Function to handle enter press on answer input, triggers solution validation
   const answerKeyPressed = (event) => {
     if (event.key === "Enter") {
       validateSolution();
     }
   }
   
+  // Function to handle enter press on min input, updates min value in state and localStorage
   const minKeyPressed = (event) => {
     if (event.key === "Enter") {
       localStorage.setItem('min', event.target.value);
@@ -30,6 +32,7 @@ function MathGameApp(props) {
     }
   }
 
+  // Function to handle enter press on max input, updates max value in state and localStorage
   const maxKeyPressed = (event) => {
     if (event.key === "Enter") {
       localStorage.setItem('max', event.target.value);
@@ -37,6 +40,7 @@ function MathGameApp(props) {
     }
   }
 
+  // Function to handle submit button click for settings, updates min and max values in state and localStorage
   const submitSettingButton = (event) => {
     localStorage.setItem('min', document.getElementsByName('min')[0].value);
     localStorage.setItem('max', document.getElementsByName('max')[0].value);
@@ -44,6 +48,7 @@ function MathGameApp(props) {
     setMax(document.getElementsByName('max')[0].value);
   }
 
+  // Function to handle reset button click, resets min and max values to defaults in state and localStorage
   const resetButton = (event) => {
     localStorage.setItem('min', -12);
     localStorage.setItem('max', 12);
@@ -53,6 +58,7 @@ function MathGameApp(props) {
     document.getElementsByName('max')[0].value = 12;
   }
 
+  // Function to validate the user's answer against the correct solution, updates score and generates new problem if correct, resets score if incorrect
   function validateSolution() {
     if (answer == solution){
       //setRandNum1

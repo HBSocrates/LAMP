@@ -4,7 +4,7 @@ import {
     NavLink,
     Bars,
     NavMenu,
-} from "./navBarElements.jsx";
+} from "./NavBarElements.jsx";
 
 const Navbar = () => {
     return (
@@ -17,6 +17,9 @@ const Navbar = () => {
                     </NavLink>
                     <NavLink to="/mathApp" >
                         Math Game
+                    </NavLink>
+                    <NavLink to="/rssFeed" >
+                        RSS Feed
                     </NavLink>
                     <NavLink to="/about" >
                         About Me

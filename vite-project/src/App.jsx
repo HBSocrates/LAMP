@@ -1,6 +1,6 @@
 import React from "react";
 import "./styles/App.css";
-import Navbar from "./components/NavBar/index";
+import Navbar from "./components/NavBar/NavBar.jsx";
 import {
     BrowserRouter as Router,
     Routes,
@@ -9,6 +9,7 @@ import {
 import Home from "./pages";
 import About from "./pages/about";
 import MathGameApp from "./pages/MathGameApp";
+import RSSFeed from "./pages/RSSFeed";
 
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/mathApp" element={<MathGameApp />} />
+                <Route path="/rssFeed" element={<RSSFeed />} />
                 <Route path="/about" element={<About />} />
             </Routes>
         </Router>
