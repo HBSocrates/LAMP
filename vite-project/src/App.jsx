@@ -9,7 +9,7 @@ import {
 import Home from "./pages";
 import About from "./pages/about";
 import MathGameApp from "./pages/MathGameApp";
-import RSSFeed from "./pages/RSSFeed";
+import RSSFeed from "./pages/rssFeed";
 
 function App() {
 
