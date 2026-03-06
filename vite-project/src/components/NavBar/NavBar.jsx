@@ -3,7 +3,7 @@ import {
     Nav,
     NavLink,
     Bars,
-    NavMenu,
+    NavMenu
 } from "./NavBarElements";
 
 const Navbar = () => {
