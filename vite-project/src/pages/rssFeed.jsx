@@ -1,7 +1,7 @@
 import React, { Suspense, useState } from "react";
 import '../styles/App.css'
-import RSSReader from "../components/RSSReader/RSSReader";
-import RSSFetch from "../components/RSSReader/rssFetch";
+import RSSReader from "../components/RSSReader/RSSReader.jsx";
+import RSSFetch from "../components/RSSReader/rssFetch.jsx";
 
 const RSSFeed = () => {
     const [currentUrl, setCurrentUrl] = useState("https://raw.githubusercontent.com/yottalogical/hello-internet-archive/master/HelloInternetArchive.rss");

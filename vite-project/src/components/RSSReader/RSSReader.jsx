@@ -1,11 +1,10 @@
 import React, { Suspense } from "react";
 import "../../styles/RSSReader.css";
+import secondsToDhms from "../UtilityFunctions/secondsToDHMS";
 import parse from "html-react-parser";
 
 const RSSReader = ({resource}) => {
-    if (resource == null) {
-        return (<div> Enter RSS Feed </div>);
-    }
+    let totalDuration = 0;
 
     let rssFeed = resource.read();
 
@@ -23,8 +22,8 @@ const RSSReader = ({resource}) => {
             const title = jsonItems[i].title;
             const link = jsonItems[i].enclosure.link;
             const date = new Date(null);
-            date.setSeconds(jsonItems[i].enclosure.duration);
-            const duration = date.toISOString().slice(11, 19);
+            const duration = secondsToDhms(jsonItems[i].enclosure.duration);
+            totalDuration += jsonItems[i].enclosure.duration;
             const pubDate = jsonItems[i].pubDate;
             //const description = jsonItems[i].description;
             feedItems.push({ title, link, duration, pubDate/*, description*/ });
@@ -37,6 +36,7 @@ const RSSReader = ({resource}) => {
     const feedItems = extractFeedItems(rssFeed.items);
     return (
         <div className="rss-reader">
+            <div>Total duration is {secondsToDhms(totalDuration)}</div>
             {feedItems.map((item, index) => ( 
                 <div className="rss-item" key={index}>
                     <h2><a href={item.link} target="_blank">{item.title}</a></h2>
