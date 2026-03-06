@@ -1,20 +1,25 @@
-import React, { Suspense } from "react";
+import React, { Suspense, useState } from "react";
 import '../styles/App.css'
 import RSSReader from "../components/RSSReader/RSSReader";
+import RSSFetch from "../components/RSSReader/rssFetch";
 
 const RSSFeed = () => {
-    let title = ["General", "Resume", "Education", "Contact Info"];
-    let content = [" I am a computer programmer, specializing in full-stack development. I have experience in a variety of programming languages and frameworks, and I am always eager to learn new technologies. I am passionate about creating efficient and user-friendly applications that solve real-world problems.",
-        "coming soon",
-        "coming soon",
-        `Email: ayang426@gmail.com
-        Phone: 559-709-2023`];
+    const [currentUrl, setCurrentUrl] = useState("https://raw.githubusercontent.com/yottalogical/hello-internet-archive/master/HelloInternetArchive.rss");
+
+    let resource = RSSFetch(currentUrl);
+
+    function setResource(url) {
+        setCurrentUrl(url);
+        console.log("Resource set to ", url);
+    }
 
     return (
         <div>
             <h1>RSS Feed</h1>
+            <input name = "rssUrl" /> <br></br>
+            <button onClick={() => resource = setResource(document.getElementsByName("rssUrl")[0].value)}>Get RSS Feed</button>
             <Suspense fallback={<div>Loading...</div>}>
-                <RSSReader rssUrl="https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/e5f91208-cc7e-4726-a312-ae280140ad11/d64f756d-6d5e-4fae-b24f-ae280140ad36/podcast.rss" />
+                <RSSReader resource={resource} />
             </Suspense>
         </div>
     );
