@@ -14,12 +14,20 @@ const Navbar = () => {
                         Math Game
                     </NavLink>
                     <NavLink to="/rssFeed" >
-                        RSS Feed
+                        Podcast RSS Feed
                     </NavLink>
                     <NavLink to="/about" >
                         About Me
                     </NavLink>
+                    <NavLink to="/signUp">
+                        Sign Up
+                    </NavLink>
                 </NavMenu>
+                <NavBtn>
+                    <NavBtnLink to="/signIn">
+                        Sign In
+                    </NavBtnLink>
+                </NavBtn>
             </Nav>
         </>
     );

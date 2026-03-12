@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import '../styles/App.css'
+import '../styles/MathGame.css'
 import '../mathOperands.js'
 import { operandsList } from '../mathOperands.js';
 
@@ -62,11 +63,11 @@ function MathGameApp(props) {
   function validateSolution() {
     if (answer == solution){
       //setRandNum1
-      let tempRandNum1 = Math.floor(Math.random() * (max - min) + min);
+      let tempRandNum1 = Math.floor(Number(Math.random() * (max - min)) + Number(min));
       setRandNum1(tempRandNum1);
 
       //setRandNum2
-      let tempRandNum2 = Math.floor(Math.random() * (max - min) + min);
+      let tempRandNum2 = Math.floor(Number(Math.random() * (max - min)) + Number(min));
       setRandNum2(tempRandNum2);
 
       //setRandOperand
@@ -109,24 +110,24 @@ function MathGameApp(props) {
     <>
       <div>
         <h1> Maths! </h1>
-        <p>Score: {score} High Score: {highScore}</p>
-        <p>{randNum1} {randOperand.name} {randNum2} =</p>
+        <p>High Score: {highScore}<br></br>Score: {score}</p>
+        <strong>{randNum1} {randOperand.name} {randNum2} =</strong> <br></br>
         <label>
-          <input name="answer" type="number" defaultValue="0" onChange={e => setAnswer(e.target.value)} onKeyDown={answerKeyPressed}/>
-          <button name="submit" onClick={() => {validateSolution()}}> Submit </button>
+          <input className="answer" type="number" defaultValue="0" onChange={e => setAnswer(e.target.value)} onKeyDown={answerKeyPressed}/>
+          <button className="submit" onClick={() => {validateSolution()}}> Submit </button>
         </label>
         <p>{response}</p>
       </div>
       <div>
         <h2>Settings</h2>
-        <label>
-          Min:
-          <input name="min" type="number" defaultValue={localStorage.getItem('min') ? localStorage.getItem('min') : -12} onKeyDown={minKeyPressed}/> <br></br>
-          Max:
-          <input name="max" type="number" defaultValue={localStorage.getItem('max') ? localStorage.getItem('max') : 12} onKeyDown={maxKeyPressed}/> <br></br>
-          <button name="submit" onClick={() => {submitSettingButton()}}> Submit </button>
+        <label className="settings">
+          Min:{"  "}
+          <input className="min" name="min" type="number" defaultValue={localStorage.getItem('min') ? localStorage.getItem('min') : -12} onKeyDown={minKeyPressed}/> <br></br>
+          Max:{"  "}
+          <input className="max" name="max" type="number" defaultValue={localStorage.getItem('max') ? localStorage.getItem('max') : 12} onKeyDown={maxKeyPressed}/> <br></br>
+          <button className="submit" onClick={() => {submitSettingButton()}}> Submit </button>
           <br></br>
-          <button name="reset" onClick={() => {resetButton()}}> Reset </button>
+          <button className="reset" onClick={() => {resetButton()}}> Reset </button>
         </label>
       </div>
     </>

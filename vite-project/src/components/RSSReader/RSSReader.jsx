@@ -9,7 +9,7 @@ const RSSReader = ({resource}) => {
     let rssFeed = resource.read();
 
     if (rssFeed.status !== "ok") {
-        return <div>Error fetching RSS feed: {rssFeed.message}</div>;
+        return <div>Error fetching RSS feed: {rssFeed.message}.  If you encounter further issues, please check the <a href="https://rss2json.com" target="_blank">rss2json</a> service.</div>;
     }
 
     // Extracts relevant information from the RSS feed items and returns an array of objects

@@ -10,6 +10,8 @@ import Home from "./pages";
 import About from "./pages/about";
 import MathGameApp from "./pages/MathGameApp";
 import RSSFeed from "./pages/rssFeed";
+import SignUp from "./pages/signUp";
+import Login from "./pages/login";
 
 function App() {
 
@@ -21,6 +23,8 @@ function App() {
                 <Route path="/mathApp" element={<MathGameApp />} />
                 <Route path="/rssFeed" element={<RSSFeed />} />
                 <Route path="/about" element={<About />} />
+                <Route path="/signUp" element={<SignUp />} />
+                <Route path="/login" element={<Login />} />
             </Routes>
         </Router>
   )
