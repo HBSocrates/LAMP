@@ -17,7 +17,7 @@ const RSSFeed = () => {
         <div>
             <h1>Podcast RSS Feed</h1>
             <p>This website uses the rss2json api to fetch RSS podcast feeds.</p>
-            <input name = "rssUrl" /> <br></br>
+            <input name = "rssUrl" defaultValue = {currentUrl} /> <br></br>
             <button onClick={() => resource = setResource(document.getElementsByName("rssUrl")[0].value)}>Get RSS Feed</button>
             <Suspense fallback={<div>Loading...</div>}>
                 <RSSReader resource={resource} />

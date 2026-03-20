@@ -93,6 +93,8 @@ function MathGameApp(props) {
       }
       setResponse("Correct!");
 
+      document.getElementById("answer").value = "";
+
       setScore(score + 1);
       if (score + 1 > highScore) {
         highScore = score + 1;
@@ -105,7 +107,8 @@ function MathGameApp(props) {
       setScore(0);
     }
   }
-
+  
+  //&#x2699; unicode for gear/settings symbol, to be used in settings button
   return (
     <>
       <div>
@@ -113,22 +116,24 @@ function MathGameApp(props) {
         <p>High Score: {highScore}<br></br>Score: {score}</p>
         <strong>{randNum1} {randOperand.name} {randNum2} =</strong> <br></br>
         <label>
-          <input className="answer" type="number" defaultValue="0" onChange={e => setAnswer(e.target.value)} onKeyDown={answerKeyPressed}/>
+          <input className="answer" id="answer" type="number" onChange={e => setAnswer(e.target.value)} onKeyDown={answerKeyPressed}/>
           <button className="submit" onClick={() => {validateSolution()}}> Submit </button>
         </label>
         <p>{response}</p>
       </div>
       <div>
-        <h2>Settings</h2>
-        <label className="settings">
-          Min:{"  "}
-          <input className="min" name="min" type="number" defaultValue={localStorage.getItem('min') ? localStorage.getItem('min') : -12} onKeyDown={minKeyPressed}/> <br></br>
-          Max:{"  "}
-          <input className="max" name="max" type="number" defaultValue={localStorage.getItem('max') ? localStorage.getItem('max') : 12} onKeyDown={maxKeyPressed}/> <br></br>
-          <button className="submit" onClick={() => {submitSettingButton()}}> Submit </button>
-          <br></br>
-          <button className="reset" onClick={() => {resetButton()}}> Reset </button>
-        </label>
+        <div id="settings-container">
+          <h2>Settings</h2>
+          <label className="settings">
+            Min:{"  "}
+            <input className="min" name="min" type="number" defaultValue={localStorage.getItem('min') ? localStorage.getItem('min') : -12} onKeyDown={minKeyPressed}/> <br></br>
+            Max:{"  "}
+            <input className="max" name="max" type="number" defaultValue={localStorage.getItem('max') ? localStorage.getItem('max') : 12} onKeyDown={maxKeyPressed}/> <br></br>
+            <button className="submit" onClick={() => {submitSettingButton()}}> Submit </button>
+            <br></br>
+            <button className="reset" onClick={() => {resetButton()}}> Reset </button>
+          </label>
+        </div>
       </div>
     </>
   )
