@@ -9,7 +9,8 @@ const RSSFetch = (rssUrl) => {
     let suspender;
 
     // Fetches RSS Feed content using a proxy to bypass CORS restrictions
-    suspender = Axios.get(`${proxyUrl}${encodeURIComponent(rssUrl)}&api_key=${api_key}&count=20`)
+    console.log(`Fetching RSS feed from ${proxyUrl}${encodeURIComponent(rssUrl)}&api_key=${api_key}&count=100`);
+    suspender = Axios.get(`${proxyUrl}${encodeURIComponent(rssUrl)}&api_key=${api_key}&count=100`)
     .catch(function (error) {
         if (error.response) {
             status = "error";

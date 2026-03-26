@@ -36,7 +36,7 @@ const RSSReader = ({resource}) => {
     const feedItems = extractFeedItems(rssFeed.items);
     return (
         <div className="rss-reader">
-            <div>Total duration is {secondsToDhms(totalDuration)}</div>
+            <div>Total duration of this podcast is {secondsToDhms(totalDuration)}</div>
             {feedItems.map((item, index) => ( 
                 <div className="rss-item" key={index}>
                     <h2><a href={item.link} target="_blank">{item.title}</a></h2>

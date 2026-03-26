@@ -19,13 +19,16 @@ const Navbar = () => {
                     <NavLink to="/about" >
                         About Me
                     </NavLink>
+                    <NavLink to="/apiTest">
+                        Api Test
+                    </NavLink>
                     <NavLink to="/signUp">
                         Sign Up
                     </NavLink>
                 </NavMenu>
                 <NavBtn>
-                    <NavBtnLink to="/signIn">
-                        Sign In
+                    <NavBtnLink to="/LogIn">
+                        Log In
                     </NavBtnLink>
                 </NavBtn>
             </Nav>
