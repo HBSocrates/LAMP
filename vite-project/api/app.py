@@ -54,14 +54,28 @@ def login():
     print('Received login attempt for user:', loginUser, file=sys.stderr)
     hash = db.session.execute(func.crypt(passString, func.gen_salt('md5'))).scalars().all()
     passHash = db.session.execute(func.crypt(passString, users[0].password)).scalars().all()
-    print('hashed password:', hash[0], file=sys.stderr)
-    print('passHash:', passHash[0], file=sys.stderr)
     if users and hash and passHash:
         if hash[0] == passHash[0]:
             print('Login successful for user:', loginUser, file=sys.stderr)
             return jsonify({'message': 'Login successful'})
     print('Login failed for user:', loginUser, file=sys.stderr)
     return jsonify({'message': 'Invalid credentials'})
+
+# Endpoint for user signup. This accepts a username/password pair and creates a new user in the database.
+@app.route('/api/signup', methods=['POST'])
+def signup():
+    newUser = request.form['username']
+    passString = request.form['password']
+    hash = db.session.execute(func.crypt(passString, func.gen_salt('md5'))).scalars().all()
+    print('Received signup attempt for user:', newUser, file=sys.stderr)
+    if hash:
+        new_user = users_template(username=newUser, password=hash[0])
+        db.session.add(new_user)
+        db.session.commit()
+        print('Signup successful for user:', newUser, file=sys.stderr)
+        return jsonify({'message': 'Signup successful'})
+    print('Signup failed for user:', newUser, file=sys.stderr)
+    return jsonify({'message': 'Signup failed'})
 
 if __name__ == '__main__':
     app.run(debug=True)
