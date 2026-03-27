@@ -6,14 +6,16 @@ const SignUp = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [processing, setProcessing] = useState(false);
-    const [signUpText, setSignUpText] = useState('Sign Up');
-    const [responseMessage, setResponseMessage] = useState('');
+    const [signUpText, setSignUpText] = useState(localStorage.getItem('loggedIn') === 'true' ? 'Currently Logged In' : 'Sign Up');
 
     const signUp = async (e) => {
         console.log('Submitting sign up form with username:', username, 'and password:', password);
         e.preventDefault();
         setProcessing(true);
         setError(null);
+
+        let message = '';
+
         try {
             const response = await fetch('/api/signup', {
                 method: 'POST', 
@@ -27,7 +29,7 @@ const SignUp = () => {
             }); 
             const data = await response.json();
             console.log('Received response:', data);
-            setResponseMessage(data.message);
+            message = data.message;
             if (!response.ok) {
                 throw new Error(data.message || 'Sign up failed');
             }
@@ -36,7 +38,7 @@ const SignUp = () => {
             setSignUpText('Sign Up Failed');    
         } finally {
             setProcessing(false);
-            if (responseMessage === 'Signup successful') {
+            if (message === 'Signup successful') {
                 setSignUpText('Sign Up Successful. Welcome, ' + username + '!');
                 setError(null);
                 localStorage.setItem('loggedIn', 'true');
@@ -51,9 +53,22 @@ const SignUp = () => {
     return (
         <div>
             <h1>{error ? error : signUpText}</h1>
-            <input name="username" required placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} /> <br></br>
-            <input name="password" type="password" required placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} /> <br></br>
-            <button type='submit' onClick = {signUp}>{processing ? 'Processing...' : 'Sign Up'}</button>
+            {signUpText === 'Currently Logged In' ? (
+                <>
+                    <p>You are already logged in as {localStorage.getItem('username')}. Please log out before trying to sign up for a new account.</p>
+                    <button type='submit' onClick={() => {
+                        localStorage.removeItem('loggedIn');
+                        localStorage.removeItem('username');
+                        setSignUpText('Sign Up');
+                    }}>Log Out</button>
+                </>
+            ) : (
+                <>
+                    <input name="username" required placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} /> <br></br>
+                    <input name="password" type="password" required placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} /> <br></br>
+                    <button type='submit' onClick = {signUp}>{processing ? 'Processing...' : 'Sign Up'}</button>
+                </>
+            )}
         </div>
     );
 };

@@ -54,8 +54,12 @@ def login():
     print('Received login attempt for user:', loginUser, file=sys.stderr)
     hash = db.session.execute(func.crypt(passString, func.gen_salt('md5'))).scalars().all()
     passHash = db.session.execute(func.crypt(passString, users[0].password)).scalars().all()
+
+#    print('Computed hash for provided password:', hash[0] if hash else 'None', file=sys.stderr)
+#    print('Stored hash for user:', users[0].password if users else 'None', file=sys.stderr)
+
     if users and hash and passHash:
-        if hash[0] == passHash[0]:
+        if users[0].password == passHash[0]:
             print('Login successful for user:', loginUser, file=sys.stderr)
             return jsonify({'message': 'Login successful'})
     print('Login failed for user:', loginUser, file=sys.stderr)
