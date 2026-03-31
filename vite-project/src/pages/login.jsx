@@ -41,12 +41,14 @@ const Login = () => {
             setError(error.message);
             setLoginText('Login Failed');
         } finally {
+            //Handle successful login
             if (message === 'Login successful') {
                 console.log('Login successful for user:', username);
                 setLoginText('Login Successful. Welcome, ' + username + '!');
                 localStorage.setItem('loggedIn', 'true');
                 localStorage.setItem('username', username);
             } else {
+                //handle failed login
                 console.log('Login failed:', message);
                 setLoginText('Login Failed');
             }
@@ -55,6 +57,7 @@ const Login = () => {
         }
     };
 
+    // Shows different page content depending on if the user is logged in or not.  If logged in, shows a welcome message and a log out button.  If not logged in, shows the login form
     return (
         <div>
             <h1>{error ? error : loginText}</h1>

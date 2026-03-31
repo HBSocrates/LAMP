@@ -37,19 +37,25 @@ const SignUp = () => {
             setError(error.message);
             setSignUpText('Sign Up Failed');    
         } finally {
+            // Handle successful sign up
             setProcessing(false);
             if (message === 'Signup successful') {
                 setSignUpText('Sign Up Successful. Welcome, ' + username + '!');
                 setError(null);
                 localStorage.setItem('loggedIn', 'true');
                 localStorage.setItem('username', username);
+            } else if (message === 'Signup failed: username already exists') {
+                setSignUpText('Sign Up Failed: User Already Exists');
+                setError(null);
             } else {
+            //Handle failed sign up
                 setSignUpText('Sign Up Failed');
                 setError(null);
             }
         }
     }
 
+    // Shows different page content depending on if the user is logged in or not.  If logged in, shows a welcome message and a log out button.  If not logged in, shows the sign up form
     return (
         <div>
             <h1>{error ? error : signUpText}</h1>

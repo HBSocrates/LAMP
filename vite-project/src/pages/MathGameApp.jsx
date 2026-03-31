@@ -4,7 +4,7 @@ import '../styles/MathGame.css'
 import '../mathOperands.js'
 import { operandsList } from '../mathOperands.js';
 
-function MathGameApp(props) {
+function MathGameApp() {
   let operandNum = 0;
   let highScore = localStorage.getItem('highScore') ? localStorage.getItem('highScore') : 0;
 
@@ -17,6 +17,68 @@ function MathGameApp(props) {
   const [score, setScore] = useState(0);
   const [min, setMin] = useState(localStorage.getItem('min') ? localStorage.getItem('min') : -12);
   const [max, setMax] = useState(localStorage.getItem('max') ? localStorage.getItem('max') : 12);
+  const [fetched, setFetched] = useState(false);
+
+  const getHighScore = async () => {
+    let message = '';
+    setFetched(true);
+
+      try {
+        const response = await fetch('/api/get_score', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            username: localStorage.getItem('username'),
+          }),
+        });
+
+        const data = await response.json();
+        message = data.message;
+        console.log('Received response:', data);
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Login failed');
+        }
+
+      } catch (error) {
+        console.log('Error fetching score:', error);
+      } finally {
+        highScore = message;
+      }
+    
+  }
+
+  const setHighScore = async () => {
+    let message = '';
+
+      try {
+        const response = await fetch('/api/set_score', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            username: localStorage.getItem('username'),
+            high_score: highScore,
+          }),
+        });
+
+        const data = await response.json();
+        message = data.message;
+        console.log('Received response:', data);
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Setting high score failed');
+        }
+
+      } catch (error) {
+        console.log('Error setting score:', error);
+      } finally {
+        console.log('Set score response message:', message);
+      }
+  }
 
   // Function to handle enter press on answer input, triggers solution validation
   const answerKeyPressed = (event) => {
@@ -24,6 +86,8 @@ function MathGameApp(props) {
       validateSolution();
     }
   }
+
+  const [showSettings, setShowSettings] = useState(false);
   
   // Function to handle enter press on min input, updates min value in state and localStorage
   const minKeyPressed = (event) => {
@@ -104,6 +168,7 @@ function MathGameApp(props) {
     }
     else {
       setResponse("Incorrect, try again!");
+      setHighScore();
       setScore(0);
     }
   }
@@ -111,10 +176,12 @@ function MathGameApp(props) {
   //&#x2699; unicode for gear/settings symbol, to be used in settings button
   return (
     <>
+      {localStorage.getItem('loggedIn') == 'true'&&!fetched ? getHighScore() : null}
       <div>
-        <h1> Maths! </h1>
+        <h1> Maths!</h1>
+        <h3>Get as many correct in a row as you can! <br></br>If you're logged in, your high score will be saved to your account</h3>
         <p>High Score: {highScore}<br></br>Score: {score}</p>
-        <strong>{randNum1} {randOperand.name} {randNum2} =</strong> <br></br>
+        <strong>{randNum1} {randOperand.name} {randNum2} =</strong>
         <label>
           <input className="answer" id="answer" type="number" onChange={e => setAnswer(e.target.value)} onKeyDown={answerKeyPressed}/>
           <button className="submit" onClick={() => {validateSolution()}}> Submit </button>
@@ -123,16 +190,25 @@ function MathGameApp(props) {
       </div>
       <div>
         <div id="settings-container">
-          <h2>Settings</h2>
-          <label className="settings">
-            Min:{"  "}
-            <input className="min" name="min" type="number" defaultValue={localStorage.getItem('min') ? localStorage.getItem('min') : -12} onKeyDown={minKeyPressed}/> <br></br>
-            Max:{"  "}
-            <input className="max" name="max" type="number" defaultValue={localStorage.getItem('max') ? localStorage.getItem('max') : 12} onKeyDown={maxKeyPressed}/> <br></br>
-            <button className="submit" onClick={() => {submitSettingButton()}}> Submit </button>
-            <br></br>
-            <button className="reset" onClick={() => {resetButton()}}> Reset </button>
-          </label>
+          <div className="settings-header">
+            <button
+              className="settings-toggle"
+              aria-expanded={showSettings}
+              onClick={() => setShowSettings(s => !s)}
+            >
+              {showSettings ? '⚙️ Hide' : '⚙️ Settings'}
+            </button>
+          </div>
+          <div className={`settings-panel ${showSettings ? 'open' : ''}`}>
+            <label className="settings">
+              Min:{"  "}
+              <input className="min" name="min" type="number" defaultValue={localStorage.getItem('min') ? localStorage.getItem('min') : -12} onKeyDown={minKeyPressed}/> <br></br>
+              Max:{"  "}
+              <input className="max" name="max" type="number" defaultValue={localStorage.getItem('max') ? localStorage.getItem('max') : 12} onKeyDown={maxKeyPressed}/> <br></br>
+              <button className="submit" onClick={() => {submitSettingButton()}}> Submit </button>
+              <button className="reset" onClick={() => {resetButton()}}> Reset </button>
+            </label>
+          </div>
         </div>
       </div>
     </>
