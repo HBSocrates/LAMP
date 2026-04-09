@@ -9,8 +9,10 @@ const RSSFetch = (rssUrl) => {
     let suspender;
 
     // Fetches RSS Feed content using a proxy to bypass CORS restrictions
-    console.log(`Fetching RSS feed from ${proxyUrl}${encodeURIComponent(rssUrl)}&api_key=${api_key}&count=100`);
-    suspender = Axios.get(`${proxyUrl}${encodeURIComponent(rssUrl)}&api_key=${api_key}&count=100`)
+    let search = `${proxyUrl}${encodeURIComponent(rssUrl)}&api_key=${api_key}&count=100`;
+    search = search.replace("%20", ""); // Replace double-encoded spaces with single-encoded spaces
+    console.log(`Fetching RSS feed from ${search}`);
+    suspender = Axios.get(search)
     .catch(function (error) {
         if (error.response) {
             status = "error";

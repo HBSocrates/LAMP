@@ -2,13 +2,19 @@ import React, { Suspense, useState } from "react";
 import '../styles/App.css'
 import RSSReader from "../components/RSSReader/RSSReader.jsx";
 import RSSFetch from "../components/RSSReader/RSSFetch.jsx";
+import RSSMenu from "../components/RSSReader/RSSMenu.jsx";
 
 const RSSFeed = () => {
     const [currentUrl, setCurrentUrl] = useState("https://raw.githubusercontent.com/yottalogical/hello-internet-archive/master/HelloInternetArchive.rss");
     const [fetched, setFetched] = useState(false);
     const [rss_feeds, setRssFeeds] = useState([]);
+    let RssSelector;
 
     let resource = RSSFetch(currentUrl);
+    if (localStorage.getItem('loggedIn') === 'true') {
+        RssSelector = <RSSMenu titles={rss_feeds} rss_feeds = {rss_feeds} name={"Your RSS Feeds"} setCurrentUrl={setCurrentUrl} />
+    }
+    
 
     // Parses our rss feed urls from the server response and updates the rss_feeds state variable
     // Returns the first value in array for immediate use
@@ -64,6 +70,8 @@ const RSSFeed = () => {
     const setRSSFeed = async (url) => {
         let message = '';
 
+        console.log('setting feed for', document.getElementsByName("podName")[0].value);
+
         try {
             const response = await fetch('/api/set_rss', {
             method: 'POST',
@@ -73,6 +81,7 @@ const RSSFeed = () => {
             body: new URLSearchParams({
                 username: localStorage.getItem('username'),
                 rss_feed_url: url,
+                rss_author: document.getElementsByName("podName")[0].value,
             }),
             });
 
@@ -106,6 +115,7 @@ const RSSFeed = () => {
         <>
             {localStorage.getItem('loggedIn') === 'true' && !fetched ? fetchRSSFeed() : null}
             <div>
+                {RssSelector}
                 <h1>Podcast RSS Feed</h1>
                 <p>This website uses the rss2json api to fetch RSS podcast feeds.</p>
                 <input name = "rssUrl" defaultValue = {currentUrl} /> <br></br>
