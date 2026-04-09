@@ -40,6 +40,22 @@ class users_template(db.Model):
     def __repr__(self):
         return f'<users_template {self.username}>'
 
+# Define rss feeds model
+
+class rss_feeds(db.Model):
+    # RSS feed ID (primary key)
+    id = db.Column(db.Integer, primary_key=True)
+
+    # RSS feed's username
+    username = db.Column(db.String(100), nullable=False)
+
+    # RSS feed URL (required field, maximum 300 characters)
+    rss_url = db.Column(db.String(300), nullable=False)
+
+    # String representation of the RSS feed object
+    def __repr__(self):
+        return f'<rss_feeds {self.rss_url}>'
+
 @app.route('/api/data', methods=['GET'])
 def get_data():
     data = {
@@ -99,6 +115,7 @@ def get_score():
     username = request.form['username']
     print('Received request for high score of user:', username, file=sys.stderr)
     user = db.session.execute(db.select(users_template).filter_by(username=username)).scalars().all()
+
     if user:
         print('User found for username:', username, '- high score:', user[0].high_score, file=sys.stderr)
         return jsonify({'message': f'{user[0].high_score}'})
@@ -112,11 +129,58 @@ def set_score():
     high_score = request.form['high_score']
     print('Received request to set high score for user:', username, file=sys.stderr)
     user = db.session.execute(db.select(users_template).filter_by(username=username)).scalars().all()
+
     if user:
         user[0].high_score = high_score
         db.session.commit()
         print('High score updated for user:', username, '- new high score:', high_score, file=sys.stderr)
         return jsonify({'message': f'High score updated for user {username}'})
+    
+    print('User not found for username:', username, file=sys.stderr)
+    return jsonify({'message': 'User not found'})
+
+@app.route('/api/get_rss', methods=['POST'])
+def get_rss():
+    username = request.form['username']
+    print('Received request for RSS feed of user:', username, file=sys.stderr)
+    user = db.session.execute(db.select(users_template).filter_by(username=username)).scalars().all()
+
+    if user:
+        user = db.session.execute(db.select(rss_feeds).filter_by(username=username)).scalars().all()
+        print('User found for username:', username, '- RSS feed URL:', user, file=sys.stderr)
+        if (len(user) == 0):
+            print('No RSS feed found for user:', username, file=sys.stderr)
+            return jsonify({'message': 'None'})
+        return jsonify({'message': f'{user}'})
+    
+    print('User not found for username:', username, file=sys.stderr)
+    return jsonify({'message': 'User not found'})
+
+@app.route('/api/set_rss', methods=['POST'])
+def set_rss():
+    username = request.form['username']
+    rss_feed_url = request.form['rss_feed_url']
+    print('Received request to set RSS feed for user:', username, 'to', rss_feed_url, file=sys.stderr)
+    user = db.session.execute(db.select(users_template).filter_by(username=username)).scalars().all()
+
+    if user:
+        rss = db.session.execute(db.select(rss_feeds).filter_by(username=username)).scalars().all()
+        if not rss:
+            new_rss = rss_feeds(id=1, username=username, rss_url=rss_feed_url)
+            db.session.add(new_rss)
+            db.session.commit()
+            print('RSS feed URL set for user:', username, '- RSS feed URL:', rss_feed_url, file=sys.stderr)
+            return jsonify({'message': 'RSS feed URL set'})
+
+        if rss_feed_url in rss[0].rss_url:
+            print('RSS feed URL already exists for user:', username, '- RSS feed URL:', rss_feed_url, file=sys.stderr)
+            return jsonify({'message': 'RSS feed URL already exists'})
+        
+        new_rss = rss_feeds(id=2, username=username, rss_url=rss_feed_url)
+        db.session.add(new_rss)
+        db.session.commit()
+        print('RSS feed URL added for user:', username, '- new RSS feed URL:', rss_feed_url, file=sys.stderr)
+        return jsonify({'message': 'RSS feed URL updated'})
     
     print('User not found for username:', username, file=sys.stderr)
     return jsonify({'message': 'User not found'})
