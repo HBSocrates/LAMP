@@ -19,8 +19,8 @@ const Navbar = () => {
                     <NavLink to="/about" >
                         About Me
                     </NavLink>
-                    <NavLink to="/apiTest">
-                        Api Test
+                    <NavLink to="/RussianJiangi">
+                        Russian Jiangi
                     </NavLink>
                     <NavLink to="/signUp">
                         Sign Up

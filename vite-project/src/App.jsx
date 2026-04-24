@@ -13,6 +13,7 @@ import RSSFeed from "./pages/rssFeed";
 import SignUp from "./pages/signUp";
 import Login from "./pages/login";
 import ApiTest from "./pages/apiTest.jsx";
+import RussianJiangi from "./pages/russianJiangi.jsx";
 
 function App() {
 
@@ -23,8 +24,8 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/mathApp" element={<MathGameApp />} />
                 <Route path="/rssFeed" element={<RSSFeed />} />
+                <Route path="/RussianJiangi" element={<RussianJiangi />} />
                 <Route path="/about" element={<About />} />
-                <Route path="/apiTest" element={<ApiTest />} />
                 <Route path="/signUp" element={<SignUp />} />
                 <Route path="/login" element={<Login />} />
             </Routes>
