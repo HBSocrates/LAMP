@@ -53,6 +53,11 @@ function RussianJiangi() {
   const [offset, setOffset] = useState({ x: 0, y: 0 })
   const [winner, setWinner] = useState(null)
   const [gameMode, setGameMode] = useState('ai')
+  const [onlineStatus, setOnlineStatus] = useState('lobby')
+  const [gameId, setGameId] = useState(null)
+  const [playerRole, setPlayerRole] = useState(null)
+  const [joinGameId, setJoinGameId] = useState('')
+  const username = localStorage.getItem('username')
 
   const getAsset = (player) => (player === 'player1' ? RussianDoll : RussianDoll2)
 
@@ -72,6 +77,43 @@ function RussianJiangi() {
       )
     )
   }
+
+  const syncGameState = async () => {
+    if (!gameId) return
+    try {
+      const response = await fetch(`/api/game/state/${gameId}`)
+      if (!response.ok) return
+      const data = await response.json()
+
+      // Sync pieces
+      setPieces(data.state_pieces)
+
+      // Sync current player
+      setCurrentPlayer(data.current_player)
+
+      // Sync winner
+      if (data.winner) {
+        setWinner(data.winner)
+      }
+
+      // Update online status if player 2 joined
+      if (onlineStatus === 'waiting' && data.status === 'active') {
+        setOnlineStatus('active')
+      }
+    } catch (err) {
+      console.error('Error syncing game state:', err)
+    }
+  }
+
+  useEffect(() => {
+    let interval
+    if (gameMode === 'online' && gameId) {
+      interval = setInterval(syncGameState, 1500)
+    }
+    return () => {
+      if (interval) clearInterval(interval)
+    }
+  }, [gameMode, gameId, onlineStatus])
 
   const snapToGrid = (x, y) => {
     const snappedX = Math.round(x / CELL_SIZE) * CELL_SIZE
@@ -137,8 +179,8 @@ function RussianJiangi() {
       y: Math.floor(index / GRID_SIZE),
     }))
 
-    const simulatePlacement = (piece, x, y) => {
-      return pieces.map((p) =>
+    const simulatePlacement = (piece, x, y, currentPieces) => {
+      return currentPieces.map((p) =>
         p.id === piece.id
           ? {
               ...p,
@@ -151,70 +193,76 @@ function RussianJiangi() {
       )
     }
 
-    const winningMove = availablePieces.flatMap((piece) =>
-      gridCoords
-        .filter((cell) => isValidPlacement(piece, cell.x, cell.y, pieces))
-        .map((cell) => ({ piece, cell }))
-    ).find(({ piece, cell }) => {
-      const simulated = simulatePlacement(piece, cell.x, cell.y)
-      return checkWinner(simulated) === 'player2'
-    })
+    const getSmallestLegalPiece = (x, y, currentPieces, player) => {
+      const pList = currentPieces.filter(p => p.player === player && !p.placed)
+      const topPiece = getTopPieceAtPosition(currentPieces, x, y)
+      const topSize = topPiece ? getSizeValue(topPiece.size) : 0
 
-    if (winningMove) {
-      return winningMove
+      return pList
+        .filter((p) => getSizeValue(p.size) > topSize)
+        .sort((a, b) => getSizeValue(a.size) - getSizeValue(b.size))[0]
     }
 
-    const blockingMove = availablePieces.flatMap((piece) =>
-      gridCoords
-        .filter((cell) => isValidPlacement(piece, cell.x, cell.y, pieces))
-        .map((cell) => ({ piece, cell }))
-    ).find(({ piece, cell }) => {
-      const simulated = simulatePlacement(piece, cell.x, cell.y)
-      return checkWinner(simulated) === 'player1'
-    })
-
-    if (blockingMove) {
-      return blockingMove
-    }
-
-    const evaluateMove = (piece, cell) => {
-      const simulated = simulatePlacement(piece, cell.x, cell.y)
+    const evaluateBoard = (currentPieces, player) => {
       let score = 0
-
-      if (cell.x === 1 && cell.y === 1) {
-        score += 15
-      }
+      const opponent = player === 'player1' ? 'player2' : 'player1'
 
       for (const line of WIN_LINES) {
-        if (!line.some((coord) => coord.x === cell.x && coord.y === cell.y)) {
-          continue
-        }
+        const linePieces = line.map((coord) => getTopPieceAtPosition(currentPieces, coord.x, coord.y))
+        const owner = linePieces[0]?.player
+        if (!owner) continue
 
-        const linePieces = line.map((coord) =>
-          getTopPieceAtPosition(simulated, coord.x, coord.y)
-        )
-        const hasOpponent = linePieces.some((top) => top?.player === 'player1')
-        if (hasOpponent) continue
+        const count = linePieces.filter(p => p?.player === owner).length
+        const weight = count === 3 ? 100 : count === 2 ? 10 : count === 1 ? 1 : 0
 
-        const aiCount = linePieces.filter((top) => top?.player === 'player2').length
-        if (aiCount === 3) {
-          score += 30
-        } else if (aiCount === 2) {
-          score += 12
-        } else if (aiCount === 1) {
-          score += 5
-        } else {
-          score += 1
-        }
+        if (owner === player) score += weight
+        else score -= weight * 1.5 // Prioritize blocking opponent
       }
-
       return score
     }
 
+    // 1. Immediate Winning Move
+    for (const cell of gridCoords) {
+      const piece = getSmallestLegalPiece(cell.x, cell.y, pieces, 'player2')
+      if (piece) {
+        const simulated = simulatePlacement(piece, cell.x, cell.y, pieces)
+        if (checkWinner(simulated) === 'player2') return { piece, cell }
+      }
+    }
+
+    // 2. Immediate Blocking Move
+    for (const cell of gridCoords) {
+      const piece = getSmallestLegalPiece(cell.x, cell.y, pieces, 'player2')
+      if (piece) {
+        const simulated = simulatePlacement(piece, cell.x, cell.y, pieces)
+        if (checkWinner(simulated) === 'player1') return { piece, cell }
+      }
+    }
+
+    // 3. Look-ahead / Heuristic Search
     const potentialMoves = availablePieces.flatMap((piece) =>
       gridCoords
         .filter((cell) => isValidPlacement(piece, cell.x, cell.y, pieces))
-        .map((cell) => ({ piece, cell, score: evaluateMove(piece, cell) }))
+        .map((cell) => {
+          const simulatedAI = simulatePlacement(piece, cell.x, cell.y, pieces)
+
+          // Simulate player's best response
+          let playerBestResponseScore = -Infinity
+          for (const pCell of gridCoords) {
+            const pPiece = getSmallestLegalPiece(pCell.x, pCell.y, simulatedAI, 'player1')
+            if (pPiece) {
+              const simulatedBoth = simulatePlacement(pPiece, pCell.x, pCell.y, simulatedAI)
+              const score = evaluateBoard(simulatedBoth, 'player1')
+              if (score > playerBestResponseScore) playerBestResponseScore = score
+            }
+          }
+
+          return {
+            piece,
+            cell,
+            score: evaluateBoard(simulatedAI, 'player2') - (playerBestResponseScore || 0)
+          }
+        })
     )
 
     if (potentialMoves.length) {
@@ -265,6 +313,7 @@ function RussianJiangi() {
     const piece = pieces.find((p) => p.id === pieceId)
     if (!piece || winner || piece.player !== currentPlayer) return
     if (gameMode === 'ai' && piece.player === 'player2') return
+    if (gameMode === 'online' && playerRole !== currentPlayer) return
 
     const rect = e.currentTarget.getBoundingClientRect()
     setDraggingPiece(pieceId)
@@ -280,7 +329,7 @@ function RussianJiangi() {
     })
   }
 
-  const handleMouseUp = () => {
+  const handleMouseUp = async () => {
     if (draggingPiece === null) return
 
     const draggedPiece = pieces.find((p) => p.id === draggingPiece)
@@ -301,6 +350,11 @@ function RussianJiangi() {
         const currentPieceSize = getSizeValue(p.size)
 
         if (!topPiece || currentPieceSize > getSizeValue(topPiece.size)) {
+          // In online mode, we will submit the move to the server
+          if (gameMode === 'online') {
+            return p // Keep current position until server response (or optimistic update)
+          }
+
           return {
             ...p,
             x: snappedX,
@@ -330,18 +384,56 @@ function RussianJiangi() {
       }
     })
 
-    setPieces(updatedPieces)
-    const newWinner = checkWinner(updatedPieces)
-    if (newWinner) {
-      setWinner(newWinner)
-    } else {
-      const placedPiece = updatedPieces.find((p) => p.id === draggingPiece)
-      const moveSucceeded = placedPiece?.placed &&
-        (!dragStartData?.placed ||
-          JSON.stringify(placedPiece.boardPosition) !== JSON.stringify(dragStartData.boardPosition))
+    if (gameMode !== 'online') {
+      setPieces(updatedPieces)
+      const newWinner = checkWinner(updatedPieces)
+      if (newWinner) {
+        setWinner(newWinner)
+      } else {
+        const placedPiece = updatedPieces.find((p) => p.id === draggingPiece)
+        const moveSucceeded = placedPiece?.placed &&
+          (!dragStartData?.placed ||
+            JSON.stringify(placedPiece.boardPosition) !== JSON.stringify(dragStartData.boardPosition))
 
-      if (moveSucceeded) {
-        setCurrentPlayer((prev) => (prev === 'player1' ? 'player2' : 'player1'))
+        if (moveSucceeded) {
+          setCurrentPlayer((prev) => (prev === 'player1' ? 'player2' : 'player1'))
+        }
+      }
+    } else {
+      // Online Multiplayer Move Submission
+      const { snappedX, snappedY } = snapToGrid(pieces.find(p => p.id === draggingPiece).x, pieces.find(p => p.id === draggingPiece).y)
+      if (isWithinBoard(snappedX, snappedY)) {
+        try {
+          const response = await fetch('/api/game/move', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+              game_id: gameId,
+              username: username,
+              piece_id: draggingPiece,
+              x: snappedX / CELL_SIZE,
+              y: snappedY / CELL_SIZE,
+            }),
+          })
+
+          if (!response.ok) {
+            const data = await response.json()
+            alert(data.message || 'Move rejected')
+            // Snap back on error
+            setPieces(updatedPieces)
+          } else {
+            // Move succeeded, syncGameState polling will pick it up, or update local state
+            const data = await response.json()
+            setPieces(data.state_pieces)
+            setCurrentPlayer(data.current_player)
+            if (data.winner) setWinner(data.winner)
+          }
+        } catch (err) {
+          console.error('Move failed:', err)
+          setPieces(updatedPieces)
+        }
+      } else {
+        setPieces(updatedPieces)
       }
     }
 
@@ -349,7 +441,67 @@ function RussianJiangi() {
     setDragStartData(null)
   }
 
+  const createGame = async () => {
+    if (!username) {
+      alert('Please log in first to create a game')
+      return
+    }
+    try {
+      const response = await fetch('/api/game/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ username }),
+      })
+      const data = await response.json()
+      if (response.ok) {
+        setGameId(data.game_id)
+        setPlayerRole('player1')
+        setOnlineStatus('waiting')
+      } else {
+        alert(data.message || 'Failed to create game')
+      }
+    } catch (err) {
+      console.error('Create game error:', err)
+      alert('An error occurred while creating the game')
+    }
+  }
+
+  const joinGame = async () => {
+    if (!username) {
+      alert('Please log in first to join a game')
+      return
+    }
+    if (!joinGameId) {
+      alert('Please enter a game ID')
+      return
+    }
+    try {
+      const response = await fetch('/api/game/join', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          game_id: joinGameId,
+          username,
+        }),
+      })
+      const data = await response.json()
+      if (response.ok) {
+        setGameId(data.game_id)
+        setPlayerRole('player2')
+        setOnlineStatus('active')
+      } else {
+        alert(data.message || 'Failed to join game')
+      }
+    } catch (err) {
+      console.error('Join game error:', err)
+      alert('An error occurred while joining the game')
+    }
+  }
+
   const resetPuzzle = () => {
+    setGameId(null)
+    setPlayerRole(null)
+    setOnlineStatus('lobby')
     setPieces(
       Array.from({ length: TOTAL_PIECES }, (_, i) => {
         const playerIndex = i % PIECES_PER_PLAYER
@@ -403,11 +555,52 @@ function RussianJiangi() {
           >
             Two Player
           </button>
+          <button
+            className={gameMode === 'online' ? 'active' : ''}
+            onClick={() => {
+              setGameMode('online')
+              resetPuzzle()
+            }}
+          >
+            Online
+          </button>
         </div>
         <p className="puzzle-status">
           Turn: <strong>{currentPlayerLabel}</strong>
         </p>
       </div>
+
+      {gameMode === 'online' && onlineStatus === 'lobby' && (
+        <div className="online-lobby">
+          <h3>Online Multiplayer Lobby</h3>
+          <div className="lobby-actions">
+            <div className="lobby-box">
+              <h4>Create Game</h4>
+              <button onClick={createGame}>Create New Game</button>
+            </div>
+            <div className="lobby-box">
+              <h4>Join Game</h4>
+              <input
+                type="text"
+                placeholder="Enter Game ID"
+                value={joinGameId}
+                onChange={(e) => setJoinGameId(e.target.value)}
+              />
+              <button onClick={joinGame}>Join Game</button>
+            </div>
+          </div>
+          {!username && <p className="lobby-warning">Please log in to play online!</p>}
+        </div>
+      )}
+
+      {gameMode === 'online' && onlineStatus === 'waiting' && (
+        <div className="online-waiting">
+          <h3>Waiting for Opponent...</h3>
+          <p>Your Game ID: <strong>{gameId}</strong></p>
+          <p>Share this ID with your friend to start!</p>
+          <button onClick={() => setOnlineStatus('lobby')}>Cancel</button>
+        </div>
+      )}
 
       <div className="puzzle-wrapper">
         {/* Puzzle Board */}

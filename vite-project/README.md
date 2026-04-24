@@ -58,6 +58,8 @@ npm run dev
 
 ### Start the backend
 
+Go into the API folder, then:
+
 If you are on macOS or Linux, use:
 
 ```bash
@@ -67,9 +69,8 @@ npm run api
 
 On Windows, after activating the virtual environment, run:
 
-```powershell
-cd vite-project\api
-flask run --no-debugger
+```
+flask run
 ```
 
 ## Notes

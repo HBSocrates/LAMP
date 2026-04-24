@@ -1,10 +1,12 @@
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import func
+from sqlalchemy import func, JSON
 from flask_migrate import Migrate
 from flask_cors import CORS
-import os, hashlib, sys
+import os, hashlib, sys, datetime
 from dotenv import load_dotenv
+# General skeleton/structure from Neon's Flask tutorial
+
 # General skeleton/structure from Neon's Flask tutorial
 
 # Load environment variables from .env file
@@ -40,6 +42,7 @@ class users_template(db.Model):
     def __repr__(self):
         return f'<users_template {self.username}>'
 
+
 # Define rss feeds model
 
 class rss_feeds(db.Model):
@@ -58,6 +61,58 @@ class rss_feeds(db.Model):
     # String representation of the RSS feed object
     def __repr__(self):
         return f'<rss_feeds {self.rss_url}>'
+
+
+class Game(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    player1_username = db.Column(db.String(100), nullable=False)
+    player2_username = db.Column(db.String(100), nullable=True)
+    state_pieces = db.Column(JSON, nullable=False)
+    current_player = db.Column(db.String(20), default='player1')
+    winner = db.Column(db.String(100), nullable=True)
+    status = db.Column(db.String(20), default='waiting')
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+
+    def __repr__(self):
+        return f'<Game {self.id} status={self.status}>'
+
+# --- Game Logic Helpers ---
+
+def get_size_value(size):
+    size_map = {'small': 1, 'medium': 2, 'large': 3}
+    return size_map.get(size, 0)
+
+def get_top_piece_at_position(piece_list, x, y):
+    top_pieces = [p for p in piece_list if p.get('placed') and p.get('boardPosition') and p['boardPosition']['x'] == x and p['boardPosition']['y'] == y]
+    if not top_pieces:
+        return None
+    return max(top_pieces, key=lambda p: get_size_value(p.get('size', '')))
+
+def check_winner(piece_list):
+    win_lines = [
+        [{'x': 0, 'y': 0}, {'x': 1, 'y': 0}, {'x': 2, 'y': 0}],
+        [{'x': 0, 'y': 1}, {'x': 1, 'y': 1}, {'x': 2, 'y': 1}],
+        [{'x': 0, 'y': 2}, {'x': 1, 'y': 2}, {'x': 2, 'y': 2}],
+        [{'x': 0, 'y': 0}, {'x': 0, 'y': 1}, {'x': 0, 'y': 2}],
+        [{'x': 1, 'y': 0}, {'x': 1, 'y': 1}, {'x': 1, 'y': 2}],
+        [{'x': 2, 'y': 0}, {'x': 2, 'y': 1}, {'x': 2, 'y': 2}],
+        [{'x': 0, 'y': 0}, {'x': 1, 'y': 1}, {'x': 2, 'y': 2}],
+        [{'x': 2, 'y': 0}, {'x': 1, 'y': 1}, {'x': 0, 'y': 2}],
+    ]
+    for line in win_lines:
+        first_piece = get_top_piece_at_position(piece_list, line[0]['x'], line[0]['y'])
+        if not first_piece:
+            continue
+        first_owner = first_piece['player']
+        if all(get_top_piece_at_position(piece_list, cell['x'], cell['y']) and get_top_piece_at_position(piece_list, cell['x'], cell['y'])['player'] == first_owner for cell in line):
+            return first_owner
+    return None
+
+def is_valid_placement(piece, x, y, piece_list):
+    # Filter out the piece being moved
+    others = [p for p in piece_list if p['id'] != piece['id']]
+    top_piece = get_top_piece_at_position(others, x, y)
+    return not top_piece or get_size_value(piece['size']) > get_size_value(top_piece['size'])
 
 @app.route('/api/data', methods=['GET'])
 def get_data():
@@ -190,7 +245,115 @@ def set_rss():
     print('User not found for username:', username, file=sys.stderr)
     return jsonify({'message': 'User not found'})
 
-if __name__ == '__main__':
-    app.run(debug=True)
+@app.route('/api/game/create', methods=['POST'])
+def create_game():
+    username = request.form.get('username')
+    if not username:
+        return jsonify({'message': 'Username is required'}), 400
+
+    pieces = []
+    for i in range(12):
+        player_index = i % 6
+        player = 'player1' if i < 6 else 'player2'
+        size = 'small' if player_index < 2 else ('medium' if player_index < 4 else 'large')
+        pieces.append({
+            'id': i,
+            'player': player,
+            'x': (i % 3) * 120 + 10,
+            'y': (i // 3) * 120 + 10,
+            'placed': False,
+            'boardPosition': None,
+            'size': size
+        })
+
+    new_game = Game(
+        player1_username=username,
+        state_pieces=pieces,
+        status='waiting',
+        current_player='player1'
+    )
+    db.session.add(new_game)
+    db.session.commit()
+    return jsonify({'game_id': new_game.id, 'player_role': 'player1'})
+
+@app.route('/api/game/join', methods=['POST'])
+def join_game():
+    game_id = request.form.get('game_id')
+    username = request.form.get('username')
+    if not game_id or not username:
+        return jsonify({'message': 'Game ID and username are required'}), 400
+
+    game = db.session.get(Game, game_id)
+    if not game:
+        return jsonify({'message': 'Game not found'}), 404
+    if game.status != 'waiting' or game.player2_username:
+        return jsonify({'message': 'Game is already full or active'}), 400
+    if game.player1_username == username:
+        return jsonify({'message': 'You are already player 1'}), 400
+
+    game.player2_username = username
+    game.status = 'active'
+    db.session.commit()
+    return jsonify({'game_id': game.id, 'player_role': 'player2'})
+
+@app.route('/api/game/state/<int:game_id>', methods=['GET'])
+def get_game_state(game_id):
+    game = db.session.get(Game, game_id)
+    if not game:
+        return jsonify({'message': 'Game not found'}), 404
+    return jsonify({
+        'state_pieces': game.state_pieces,
+        'current_player': game.current_player,
+        'winner': game.winner,
+        'status': game.status
+    })
+
+@app.route('/api/game/move', methods=['POST'])
+def make_move():
+    game_id = request.form.get('game_id')
+    username = request.form.get('username')
+    piece_id = request.form.get('piece_id', type=int)
+    x = request.form.get('x', type=int)
+    y = request.form.get('y', type=int)
+
+    if not all([game_id, username, piece_id is not None, x is not None, y is not None]):
+        return jsonify({'message': 'Missing move parameters'}), 400
+
+    game = db.session.get(Game, game_id)
+    if not game:
+        return jsonify({'message': 'Game not found'}), 404
+
+    expected_username = game.player1_username if game.current_player == 'player1' else game.player2_username
+    if username != expected_username:
+        return jsonify({'message': 'Not your turn'}), 403
+
+    pieces = list(game.state_pieces)
+    piece = next((p for p in pieces if p['id'] == piece_id), None)
+    if not piece:
+        return jsonify({'message': 'Piece not found'}), 400
+
+    expected_player = 'player1' if game.current_player == 'player1' else 'player2'
+    if piece['player'] != expected_player:
+        return jsonify({'message': 'Cannot move opponent piece'}), 400
+
+    if not is_valid_placement(piece, x, y, pieces):
+        return jsonify({'message': 'Invalid move: piece too small to stack'}), 400
+
+    piece['x'] = x * 100
+    piece['y'] = y * 100
+    piece['placed'] = True
+    piece['boardPosition'] = {'x': x, 'y': y}
+
+    game.state_pieces = pieces
+
+    winner = check_winner(pieces)
+    if winner:
+        game.winner = game.player1_username if winner == 'player1' else game.player2_username
+        game.status = 'finished'
+    else:
+        game.current_player = 'player2' if game.current_player == 'player1' else 'player1'
+
+    db.session.commit()
+    return jsonify({'success': True, 'new_state': game.state_pieces, 'current_player': game.current_player, 'winner': game.winner, 'status': game.status})
 
 
