@@ -41,7 +41,11 @@
   align-items: flex-start;
   margin-bottom: 30px;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: space-between;
+}
+
+.player-1-pieces, .player-2-pieces {
+  flex: 0 0 auto;
 }
 
 .game-header {
@@ -91,10 +95,10 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
-  gap: 2px;
+  gap: 0;
   background-color: rgba(255, 255, 255, 0.1);
   border: 3px solid white;
-  padding: 8px;
+  padding: 0;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
@@ -103,9 +107,10 @@
   width: 100px;
   height: 100px;
   background-color: rgba(255, 255, 255, 0.15);
-  border: 2px dashed rgba(255, 255, 255, 0.4);
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0;
   transition: background-color 0.2s;
+  box-sizing: border-box;
 }
 
 .grid-cell:hover {

@@ -28,8 +28,8 @@ function RussianJiangi() {
   }
 
   const getStartingPosition = (index) => ({
-    x: (index % 3) * 120 + 10,
-    y: Math.floor(index / 3) * 120 + 10,
+    x: (index % 2) * 120 + 10,
+    y: Math.floor(index / 2) * 120 + 10,
   })
 
   const [pieces, setPieces] = useState(
@@ -38,8 +38,8 @@ function RussianJiangi() {
       return {
         id: i,
         player: i < PIECES_PER_PLAYER ? 'player1' : 'player2',
-        x: getStartingPosition(i).x,
-        y: getStartingPosition(i).y,
+        x: getStartingPosition(playerIndex).x,
+        y: getStartingPosition(playerIndex).y,
         placed: false,
         boardPosition: null,
         size: getSizeForPiece(playerIndex),
@@ -49,6 +49,7 @@ function RussianJiangi() {
 
   const [currentPlayer, setCurrentPlayer] = useState(START_PLAYER)
   const [draggingPiece, setDraggingPiece] = useState(null)
+  const [dragPos, setDragPos] = useState({ x: 0, y: 0 })
   const [dragStartData, setDragStartData] = useState(null)
   const [offset, setOffset] = useState({ x: 0, y: 0 })
   const [winner, setWinner] = useState(null)
@@ -64,18 +65,14 @@ function RussianJiangi() {
   const handleMouseMove = (e) => {
     if (draggingPiece === null) return
 
-    const boardElement = document.getElementById('puzzle-board')
-    if (!boardElement) return
+    const containerElement = document.getElementById('jiangi-game-root')
+    if (!containerElement) return
 
-    const boardRect = boardElement.getBoundingClientRect()
-    const x = e.clientX - boardRect.left - offset.x
-    const y = e.clientY - boardRect.top - offset.y
+    const containerRect = containerElement.getBoundingClientRect()
+    const x = e.clientX - containerRect.left - offset.x
+    const y = e.clientY - containerRect.top - offset.y
 
-    setPieces((prevPieces) =>
-      prevPieces.map((p) =>
-        p.id === draggingPiece ? { ...p, x, y } : p
-      )
-    )
+    setDragPos({ x, y })
   }
 
   const syncGameState = async () => {
@@ -329,15 +326,29 @@ function RussianJiangi() {
     })
   }
 
+  const getSizeDimensions = (size) => {
+    const dims = { small: 60, medium: 80, large: 100 }
+    return dims[size]
+  }
+
   const handleMouseUp = async () => {
     if (draggingPiece === null) return
 
     const draggedPiece = pieces.find((p) => p.id === draggingPiece)
+    const boardElement = document.getElementById('puzzle-board')
+    if (!boardElement) return
+    const boardRect = boardElement.getBoundingClientRect()
+    const containerRect = document.getElementById('jiangi-game-root').getBoundingClientRect()
+
+    // Calculate piece position relative to the board using the current drag position
+    const relX = dragPos.x - (boardRect.left - containerRect.left)
+    const relY = dragPos.y - (boardRect.top - containerRect.top)
+
     const updatedPieces = pieces.map((p) => {
       if (p.id !== draggingPiece) return p
 
-      const { snappedX, snappedY } = snapToGrid(p.x, p.y)
-      const start = getStartingPosition(p.id)
+      const { snappedX, snappedY } = snapToGrid(relX, relY)
+      const start = getStartingPosition(p.id % PIECES_PER_PLAYER)
       const originalBoardPosition = dragStartData?.boardPosition
       const originalPlaced = dragStartData?.placed
 
@@ -350,15 +361,18 @@ function RussianJiangi() {
         const currentPieceSize = getSizeValue(p.size)
 
         if (!topPiece || currentPieceSize > getSizeValue(topPiece.size)) {
-          // In online mode, we will submit the move to the server
           if (gameMode === 'online') {
-            return p // Keep current position until server response (or optimistic update)
+            return p
           }
+
+          const pieceDim = getSizeDimensions(p.size)
+          const offsetX = (CELL_SIZE - pieceDim) / 2
+          const offsetY = (CELL_SIZE - pieceDim) / 2
 
           return {
             ...p,
-            x: snappedX,
-            y: snappedY,
+            x: snappedX + offsetX,
+            y: snappedY + offsetY,
             placed: true,
             boardPosition: { x: snappedX / CELL_SIZE, y: snappedY / CELL_SIZE },
           }
@@ -400,8 +414,7 @@ function RussianJiangi() {
         }
       }
     } else {
-      // Online Multiplayer Move Submission
-      const { snappedX, snappedY } = snapToGrid(pieces.find(p => p.id === draggingPiece).x, pieces.find(p => p.id === draggingPiece).y)
+      const { snappedX, snappedY } = snapToGrid(relX, relY)
       if (isWithinBoard(snappedX, snappedY)) {
         try {
           const response = await fetch('/api/game/move', {
@@ -419,10 +432,8 @@ function RussianJiangi() {
           if (!response.ok) {
             const data = await response.json()
             alert(data.message || 'Move rejected')
-            // Snap back on error
             setPieces(updatedPieces)
           } else {
-            // Move succeeded, syncGameState polling will pick it up, or update local state
             const data = await response.json()
             setPieces(data.state_pieces)
             setCurrentPlayer(data.current_player)
@@ -508,8 +519,8 @@ function RussianJiangi() {
         return {
           id: i,
           player: i < PIECES_PER_PLAYER ? 'player1' : 'player2',
-          x: getStartingPosition(i).x,
-          y: getStartingPosition(i).y,
+          x: getStartingPosition(playerIndex).x,
+          y: getStartingPosition(playerIndex).y,
           placed: false,
           boardPosition: null,
           size: getSizeForPiece(playerIndex),
@@ -533,7 +544,7 @@ function RussianJiangi() {
   const currentPlayerLabel = currentPlayer === 'player1' ? 'RussianDoll' : 'RussianDoll2'
 
   return (
-    <div className="russian-jiangi-container" onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
+    <div id="jiangi-game-root" className="russian-jiangi-container" onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
       <h1>Russian Jiangi</h1>
       <div className="game-header">
         <div className="mode-select">
@@ -603,6 +614,52 @@ function RussianJiangi() {
       )}
 
       <div className="puzzle-wrapper">
+        {/* Dragging Piece Overlay (Rendered at root of wrapper) */}
+        {draggingPiece !== null && pieces.map((p) =>
+          p.id === draggingPiece && (
+            <div
+              key={`dragging-${p.id}`}
+              className={`puzzle-piece draggable ${p.size} ${p.player}`}
+              style={{
+                position: 'absolute',
+                left: dragPos.x,
+                top: dragPos.y,
+                zIndex: 1000,
+                pointerEvents: 'none',
+                cursor: 'grabbing',
+                opacity: 1,
+              }}
+            >
+              <img src={getAsset(p.player)} alt="Dragging piece" />
+            </div>
+          )
+        )}
+
+        {/* Player 1 Pieces */}
+        <div className="pieces-container player-1-pieces">
+          <h3>Player 1's Pieces</h3>
+          <div className="pieces-grid">
+            {pieces
+              .filter((p) => p.player === 'player1' && !p.placed && p.id !== draggingPiece)
+              .map((piece) => (
+                <div
+                  key={`piece-${piece.id}`}
+                  className={`puzzle-piece draggable ${piece.size} ${piece.player}`}
+                  onMouseDown={(e) => handleMouseDown(e, piece.id)}
+                  data-size={piece.size}
+                  style={{
+                    left: piece.x,
+                    top: piece.y,
+                    cursor: piece.player === currentPlayer ? (draggingPiece === piece.id ? 'grabbing' : 'grab') : 'not-allowed',
+                    opacity: piece.player === currentPlayer ? 1 : 0.45,
+                  }}
+                >
+                  <img src={getAsset(piece.player)} alt={`${piece.player} piece`} />
+                </div>
+              ))}
+          </div>
+        </div>
+
         {/* Puzzle Board */}
         <div
           id="puzzle-board"
@@ -644,30 +701,28 @@ function RussianJiangi() {
             })}
         </div>
 
-        {/* Available Pieces */}
-        <div className="pieces-container">
-          <h3>Available Pieces</h3>
-          <p className="stacking-hint">💡 Larger pieces can be placed over smaller pieces!</p>
+        {/* Player 2 Pieces */}
+        <div className="pieces-container player-2-pieces">
+          <h3>Player 2's Pieces</h3>
           <div className="pieces-grid">
-            {pieces.map(
-              (piece) =>
-                !piece.placed && (
-                  <div
-                    key={`piece-${piece.id}`}
-                    className={`puzzle-piece draggable ${piece.size} ${piece.player}`}
-                    onMouseDown={(e) => handleMouseDown(e, piece.id)}
-                    data-size={piece.size}
-                    style={{
-                      left: piece.x,
-                      top: piece.y,
-                      cursor: piece.player === currentPlayer ? (draggingPiece === piece.id ? 'grabbing' : 'grab') : 'not-allowed',
-                      opacity: piece.player === currentPlayer ? 1 : 0.45,
-                    }}
-                  >
-                    <img src={getAsset(piece.player)} alt={`${piece.player} piece`} />
-                  </div>
-                )
-            )}
+            {pieces
+              .filter((p) => p.player === 'player2' && !p.placed && p.id !== draggingPiece)
+              .map((piece) => (
+                <div
+                  key={`piece-${piece.id}`}
+                  className={`puzzle-piece draggable ${piece.size} ${piece.player}`}
+                  onMouseDown={(e) => handleMouseDown(e, piece.id)}
+                  data-size={piece.size}
+                  style={{
+                    left: piece.x,
+                    top: piece.y,
+                    cursor: piece.player === currentPlayer ? (draggingPiece === piece.id ? 'grabbing' : 'grab') : 'not-allowed',
+                    opacity: piece.player === currentPlayer ? 1 : 0.45,
+                  }}
+                >
+                  <img src={getAsset(piece.player)} alt={`${piece.player} piece`} />
+                </div>
+              ))}
           </div>
         </div>
       </div>
