@@ -8,26 +8,26 @@ import RSSMenu from "../components/RSSReader/RSSMenu.jsx";
 const RSSFeed = () => {
     const [currentUrl, setCurrentUrl] = useState("https://raw.githubusercontent.com/yottalogical/hello-internet-archive/master/HelloInternetArchive.rss");
     const [rssUrlInput, setRssUrlInput] = useState(currentUrl);
-    const [fetched, setFetched] = useState(false);
     const [rss_feeds, setRssFeeds] = useState([]);
 
     // Parses the server response for RSS feed URLs
-    const feed_parse = useCallback((message) => {
+    const parseFeedMessage = useCallback((message) => {
+        if (!message || message === 'None') return null;
+
         console.log('Parsing message:', message);
         const cleaned = message
             .replace(/([<]rss_feeds )/g, '')
             .replace(/\[/g, '')
             .replace(/\>]/g, '');
 
-        const rss_urls = cleaned.split('>,');
+        const rss_urls = cleaned.split('>,').filter(url => url.trim() !== "");
         console.log('Parsed RSS feed URLs:', rss_urls);
         setRssFeeds(rss_urls);
 
-        return rss_urls[0];
+        return rss_urls.length > 0 ? rss_urls[0] : null;
     }, []);
 
-    const fetchRSSFeed = useCallback(async () => {
-        setFetched(true);
+    const fetchUserRSSFeeds = useCallback(async () => {
         try {
             const response = await fetch('/api/get_rss', {
                 method: 'POST',
@@ -36,48 +36,23 @@ const RSSFeed = () => {
             });
 
             const data = await response.json();
-            const message = data.message;
+            if (!response.ok) throw new Error(data.message || 'RSS fetch failed');
 
-            if (!response.ok) {
-                throw new Error(data.message || 'RSS fetch failed');
-            }
-
-            if (message && message !== 'None') {
-                const firstUrl = feed_parse(message);
+            const firstUrl = parseFeedMessage(data.message);
+            if (firstUrl) {
                 setCurrentUrl(firstUrl);
-            } else {
-                console.log('No feed URL received from server.');
+                setRssUrlInput(firstUrl);
             }
         } catch (error) {
-            console.error('Error fetching feed:', error);
+            console.error('Error fetching feeds:', error);
         }
-    }, [feed_parse]);
+    }, [parseFeedMessage]);
 
     useEffect(() => {
         if (localStorage.getItem('loggedIn') === 'true') {
-            fetchRSSFeed();
+            fetchUserRSSFeeds();
         }
-    }, [fetchRSSFeed]);
-
-    const setRSSFeedOnServer = async (url, authorName) => {
-        try {
-            const response = await fetch('/api/set_rss', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({
-                    username: localStorage.getItem('username'),
-                    rss_feed_url: url,
-                    rss_author: authorName,
-                }),
-            });
-
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.message || 'RSS feed update failed');
-            console.log('RSS feed URL updated successfully');
-        } catch (error) {
-            console.error('Error updating feed:', error);
-        }
-    };
+    }, [fetchUserRSSFeeds]);
 
     const handleGetFeed = () => {
         setCurrentUrl(rssUrlInput);
@@ -85,22 +60,21 @@ const RSSFeed = () => {
 
     const handleSetResource = (url) => {
         setCurrentUrl(url);
-        // We'll extract the pod name from the RSSReader's title if possible,
-        // but since the setRSSFeed logic relied on a DOM element from RSSReader,
-        // we'll handle the server update when the user explicitly wants to save.
-        // For now, we maintain the ability to trigger it.
     };
-
-    let RssSelector = null;
-    if (localStorage.getItem('loggedIn') === 'true') {
-        RssSelector = <RSSMenu titles={rss_feeds} rss_feeds={rss_feeds} name={"Your RSS Feeds"} setCurrentUrl={setCurrentUrl} />;
-    }
 
     const resource = RSSFetch(currentUrl);
 
     return (
         <div className="rss-feed-wrapper">
-            {RssSelector}
+            {localStorage.getItem('loggedIn') === 'true' && (
+                <RSSMenu
+                    titles={rss_feeds}
+                    rss_feeds={rss_feeds}
+                    name="Your RSS Feeds"
+                    setCurrentUrl={setCurrentUrl}
+                />
+            )}
+
             <div className="rss-main-container">
                 <div className="rss-control-card">
                     <h1>Podcast RSS Feed</h1>
@@ -111,8 +85,11 @@ const RSSFeed = () => {
                             className="rss-url-input"
                             value={rssUrlInput}
                             onChange={(e) => setRssUrlInput(e.target.value)}
+                            placeholder="Enter RSS Feed URL..."
                         />
-                        <button className="submit-btn" onClick={handleGetFeed}>Get RSS Feed</button>
+                        <button className="submit-btn" onClick={handleGetFeed}>
+                            Get RSS Feed
+                        </button>
                     </div>
                 </div>
 

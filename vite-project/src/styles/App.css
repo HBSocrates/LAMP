@@ -26,6 +26,8 @@
   background: linear-gradient(90deg, #646cff, #9d8cfd);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  padding-bottom: 0.5rem;
+  line-height: 1.2;
 }
 
 .tagline {
