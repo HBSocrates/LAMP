@@ -1,217 +1,204 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import '../styles/App.css'
 import '../styles/MathGame.css'
-import '../mathOperands.js'
 import { operandsList } from '../mathOperands.js';
 
 function MathGameApp() {
-  let operandNum = 0;
-  let highScore = localStorage.getItem('highScore') ? localStorage.getItem('highScore') : 0;
+  const inputRef = useRef(null);
 
   const [randNum1, setRandNum1] = useState(0);
   const [randNum2, setRandNum2] = useState(0);
-  const [randOperand, setRandOperand] = useState(operandsList[operandNum]);
+  const [randOperand, setRandOperand] = useState(operandsList[0]);
   const [solution, setSolution] = useState(0);
-  const [answer, setAnswer] = useState(0);
+  const [answer, setAnswer] = useState("");
   const [response, setResponse] = useState("");
   const [score, setScore] = useState(0);
-  const [min, setMin] = useState(localStorage.getItem('min') ? localStorage.getItem('min') : -12);
-  const [max, setMax] = useState(localStorage.getItem('max') ? localStorage.getItem('max') : 12);
-  const [fetched, setFetched] = useState(false);
-
-  const getHighScore = async () => {
-    let message = '';
-    setFetched(true);
-
-      try {
-        const response = await fetch('/api/get_score', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams({
-            username: localStorage.getItem('username'),
-          }),
-        });
-
-        const data = await response.json();
-        message = data.message;
-        console.log('Received response:', data);
-
-        if (!response.ok) {
-            throw new Error(data.message || 'Login failed');
-        }
-
-      } catch (error) {
-        console.log('Error fetching score:', error);
-      } finally {
-        highScore = message;
-      }
-    
-  }
-
-  const setHighScore = async () => {
-    let message = '';
-
-      try {
-        const response = await fetch('/api/set_score', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams({
-            username: localStorage.getItem('username'),
-            high_score: highScore,
-          }),
-        });
-
-        const data = await response.json();
-        message = data.message;
-        console.log('Received response:', data);
-
-        if (!response.ok) {
-            throw new Error(data.message || 'Setting high score failed');
-        }
-
-      } catch (error) {
-        console.log('Error setting score:', error);
-      } finally {
-        console.log('Set score response message:', message);
-      }
-  }
-
-  // Function to handle enter press on answer input, triggers solution validation
-  const answerKeyPressed = (event) => {
-    if (event.key === "Enter") {
-      validateSolution();
-    }
-  }
-
+  const [highScore, setHighScore] = useState(localStorage.getItem('highScore') || 0);
+  const [min, setMin] = useState(localStorage.getItem('min') || -12);
+  const [max, setMax] = useState(localStorage.getItem('max') || 12);
   const [showSettings, setShowSettings] = useState(false);
-  
-  // Function to handle enter press on min input, updates min value in state and localStorage
-  const minKeyPressed = (event) => {
-    if (event.key === "Enter") {
-      localStorage.setItem('min', event.target.value);
-      setMin(event.target.value);
+  const [animationClass, setAnimationClass] = useState("");
+
+  const generateProblem = () => {
+    const n1 = Math.floor(Math.random() * (Number(max) - Number(min) + 1)) + Number(min);
+    const n2 = Math.floor(Math.random() * (Number(max) - Number(min) + 1)) + Number(min);
+    const opIdx = Math.floor(Math.random() * operandsList.length);
+    const op = operandsList[opIdx];
+
+    let sol = 0;
+    switch (op.name) {
+      case '+': sol = n1 + n2; break;
+      case '-': sol = n1 - n2; break;
+      case '*': sol = n1 * n2; break;
+      case '/': sol = Math.floor(n1 / n2); break; // simplified for game
+      default: sol = 0;
     }
-  }
 
-  // Function to handle enter press on max input, updates max value in state and localStorage
-  const maxKeyPressed = (event) => {
-    if (event.key === "Enter") {
-      localStorage.setItem('max', event.target.value);
-      setMax(event.target.value);
+    setRandNum1(n1);
+    setRandNum2(n2);
+    setRandOperand(op);
+    setSolution(sol);
+    setAnswer("");
+  };
+
+  useEffect(() => {
+    generateProblem();
+    if (localStorage.getItem('loggedIn') === 'true') {
+      fetchHighScore();
     }
-  }
+  }, []);
 
-  // Function to handle submit button click for settings, updates min and max values in state and localStorage
-  const submitSettingButton = (event) => {
-    localStorage.setItem('min', document.getElementsByName('min')[0].value);
-    localStorage.setItem('max', document.getElementsByName('max')[0].value);
-    setMin(document.getElementsByName('min')[0].value);
-    setMax(document.getElementsByName('max')[0].value);
-  }
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [randNum1, randNum2, randOperand]);
 
-  // Function to handle reset button click, resets min and max values to defaults in state and localStorage
-  const resetButton = (event) => {
+  const fetchHighScore = async () => {
+    try {
+      const response = await fetch('/api/get_score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ username: localStorage.getItem('username') }),
+      });
+      const data = await response.json();
+      if (data.message) setHighScore(data.message);
+    } catch (error) {
+      console.error('Error fetching score:', error);
+    }
+  };
+
+  const updateHighScoreOnServer = async (newHigh) => {
+    try {
+      await fetch('/api/set_score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          username: localStorage.getItem('username'),
+          high_score: newHigh
+        }),
+      });
+    } catch (error) {
+      console.error('Error setting score:', error);
+    }
+  };
+
+  const validateSolution = () => {
+    if (parseInt(answer) === solution) {
+      const newScore = score + 1;
+      setScore(newScore);
+      setResponse("Correct!");
+      setAnimationClass("correct-anim");
+
+      if (newScore > highScore) {
+        setHighScore(newScore);
+        localStorage.setItem('highScore', newScore);
+        if (localStorage.getItem('loggedIn') === 'true') {
+          updateHighScoreOnServer(newScore);
+        }
+      }
+
+      setTimeout(() => {
+        setAnimationClass("");
+        generateProblem();
+      }, 600);
+    } else {
+      setResponse("Incorrect, try again!");
+      setAnimationClass("incorrect-anim");
+      setScore(0);
+      if (localStorage.getItem('loggedIn') === 'true') {
+        updateHighScoreOnServer(highScore);
+      }
+      setTimeout(() => setAnimationClass(""), 600);
+    }
+  };
+
+  const handleSettingSubmit = () => {
+    const minVal = document.getElementsByName('min')[0].value;
+    const maxVal = document.getElementsByName('max')[0].value;
+    localStorage.setItem('min', minVal);
+    localStorage.setItem('max', maxVal);
+    setMin(minVal);
+    setMax(maxVal);
+    setShowSettings(false);
+  };
+
+  const handleResetSettings = () => {
     localStorage.setItem('min', -12);
     localStorage.setItem('max', 12);
     setMin(-12);
     setMax(12);
     document.getElementsByName('min')[0].value = -12;
     document.getElementsByName('max')[0].value = 12;
-  }
+  };
 
-  // Function to validate the user's answer against the correct solution, updates score and generates new problem if correct, resets score if incorrect
-  function validateSolution() {
-    if (answer == solution){
-      //setRandNum1
-      let tempRandNum1 = Math.floor(Number(Math.random() * (max - min)) + Number(min));
-      setRandNum1(tempRandNum1);
-
-      //setRandNum2
-      let tempRandNum2 = Math.floor(Number(Math.random() * (max - min)) + Number(min));
-      setRandNum2(tempRandNum2);
-
-      //setRandOperand
-      operandNum = Math.floor(Math.random() * (3 - 0));
-      setRandOperand(operandsList[operandNum]);
-
-      //setSolution
-      switch (operandNum) {
-        case 0:
-                setSolution(tempRandNum1 + tempRandNum2);
-                break
-        case 1:
-                setSolution(tempRandNum1 - tempRandNum2);
-                break
-        case 2:
-                setSolution(tempRandNum1 * tempRandNum2);
-                break
-        case 3:
-                setSolution(tempRandNum1 / tempRandNum2);
-                break
-        default:
-                console.log("error");
-      }
-      setResponse("Correct!");
-
-      document.getElementById("answer").value = "";
-
-      setScore(score + 1);
-      if (score + 1 > highScore) {
-        highScore = score + 1;
-        localStorage.setItem('highScore', highScore);
-      }
-
-    }
-    else {
-      setResponse("Incorrect, try again!");
-      setHighScore();
-      setScore(0);
-    }
-  }
-  
-  //&#x2699; unicode for gear/settings symbol, to be used in settings button
   return (
-    <>
-      {localStorage.getItem('loggedIn') == 'true'&&!fetched ? getHighScore() : null}
-      <div>
-        <h1> Maths!</h1>
-        <h3>Get as many correct in a row as you can! <br></br>If you're logged in, your high score will be saved to your account</h3>
-        <p>High Score: {highScore}<br></br>Score: {score}</p>
-        <strong>{randNum1} {randOperand.name} {randNum2} =</strong>
-        <label>
-          <input className="answer" id="answer" type="number" onChange={e => setAnswer(e.target.value)} onKeyDown={answerKeyPressed}/>
-          <button className="submit" onClick={() => {validateSolution()}}> Submit </button>
-        </label>
-        <p>{response}</p>
+    <div className="math-game-wrapper">
+      <div className="stats-bar">
+        <div className="stat-item">
+          <span className="stat-label">Score</span>
+          <span className="stat-value">{score}</span>
+        </div>
+        <div className="stat-item">
+          <span className="stat-label">High Score</span>
+          <span className="stat-value">{highScore}</span>
+        </div>
       </div>
-      <div>
-        <div id="settings-container">
-          <div className="settings-header">
-            <button
-              className="settings-toggle"
-              aria-expanded={showSettings}
-              onClick={() => setShowSettings(s => !s)}
-            >
-              {showSettings ? '⚙️ Hide' : '⚙️ Settings'}
-            </button>
+
+      <div className={`game-card ${animationClass}`}>
+        <h1 className="game-title">Maths!</h1>
+        <p className="game-subtitle">Get as many correct in a row as you can!</p>
+
+        <div className="problem-container">
+          <div className="problem-display">
+            {randNum1} <span className="operator">{randOperand.name}</span> {randNum2} =
           </div>
-          <div className={`settings-panel ${showSettings ? 'open' : ''}`}>
-            <label className="settings">
-              Min:{"  "}
-              <input className="min" name="min" type="number" defaultValue={localStorage.getItem('min') ? localStorage.getItem('min') : -12} onKeyDown={minKeyPressed}/> <br></br>
-              Max:{"  "}
-              <input className="max" name="max" type="number" defaultValue={localStorage.getItem('max') ? localStorage.getItem('max') : 12} onKeyDown={maxKeyPressed}/> <br></br>
-              <button className="submit" onClick={() => {submitSettingButton()}}> Submit </button>
-              <button className="reset" onClick={() => {resetButton()}}> Reset </button>
-            </label>
+
+          <div className="answer-row">
+            <input
+              ref={inputRef}
+              className="answer-input"
+              type="number"
+              value={answer}
+              onChange={e => setAnswer(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && validateSolution()}
+            />
+            <button className="submit-btn" onClick={validateSolution}>Submit</button>
+          </div>
+
+          <div className={`response-msg ${response === "Correct!" ? "success" : "error"}`}>
+            {response}
           </div>
         </div>
       </div>
-    </>
+
+      <div id="settings-container">
+        <div className="settings-header">
+          <button
+            className="settings-toggle"
+            onClick={() => setShowSettings(!showSettings)}
+          >
+            {showSettings ? '⚙️ Hide' : '⚙️ Settings'}
+          </button>
+        </div>
+        <div className={`settings-panel ${showSettings ? 'open' : ''}`}>
+          <div className="settings-content">
+            <div className="setting-group">
+              <label>Min Value</label>
+              <input name="min" type="number" defaultValue={min} />
+            </div>
+            <div className="setting-group">
+              <label>Max Value</label>
+              <input name="max" type="number" defaultValue={max} />
+            </div>
+            <div className="settings-actions">
+              <button className="submit-btn small" onClick={handleSettingSubmit}>Apply</button>
+              <button className="reset-btn small" onClick={handleResetSettings}>Reset</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
 
