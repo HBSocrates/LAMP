@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import '../styles/App.css'
 import '../styles/MathGame.css'
 import { operandsList } from '../mathOperands.js';
@@ -19,9 +19,13 @@ function MathGameApp() {
   const [showSettings, setShowSettings] = useState(false);
   const [animationClass, setAnimationClass] = useState("");
 
-  const generateProblem = () => {
-    const n1 = Math.floor(Math.random() * (Number(max) - Number(min) + 1)) + Number(min);
-    const n2 = Math.floor(Math.random() * (Number(max) - Number(min) + 1)) + Number(min);
+  const generateProblem = useCallback(() => {
+    const minVal = Number(min);
+    const maxVal = Number(max);
+    const range = maxVal - minVal + 1;
+
+    const n1 = Math.floor(Math.random() * range) + minVal;
+    const n2 = Math.floor(Math.random() * range) + minVal;
     const opIdx = Math.floor(Math.random() * operandsList.length);
     const op = operandsList[opIdx];
 
@@ -30,7 +34,11 @@ function MathGameApp() {
       case '+': sol = n1 + n2; break;
       case '-': sol = n1 - n2; break;
       case '*': sol = n1 * n2; break;
-      case '/': sol = Math.floor(n1 / n2); break; // simplified for game
+      case '/':
+        // Ensure no division by zero and clean integer result for the game
+        const divisor = n2 === 0 ? 1 : n2;
+        sol = Math.floor(n1 / divisor);
+        break;
       default: sol = 0;
     }
 
@@ -39,14 +47,14 @@ function MathGameApp() {
     setRandOperand(op);
     setSolution(sol);
     setAnswer("");
-  };
+  }, [min, max]);
 
   useEffect(() => {
     generateProblem();
     if (localStorage.getItem('loggedIn') === 'true') {
       fetchHighScore();
     }
-  }, []);
+  }, [generateProblem]);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -114,8 +122,14 @@ function MathGameApp() {
   };
 
   const handleSettingSubmit = () => {
-    const minVal = document.getElementsByName('min')[0].value;
-    const maxVal = document.getElementsByName('max')[0].value;
+    const minInput = document.getElementsByName('min')[0];
+    const maxInput = document.getElementsByName('max')[0];
+
+    if (!minInput || !maxInput) return;
+
+    const minVal = minInput.value;
+    const maxVal = maxInput.value;
+
     localStorage.setItem('min', minVal);
     localStorage.setItem('max', maxVal);
     setMin(minVal);
@@ -128,8 +142,10 @@ function MathGameApp() {
     localStorage.setItem('max', 12);
     setMin(-12);
     setMax(12);
-    document.getElementsByName('min')[0].value = -12;
-    document.getElementsByName('max')[0].value = 12;
+    const minInput = document.getElementsByName('min')[0];
+    const maxInput = document.getElementsByName('max')[0];
+    if (minInput) minInput.value = -12;
+    if (maxInput) maxInput.value = 12;
   };
 
   return (
