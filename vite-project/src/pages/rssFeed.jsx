@@ -6,8 +6,8 @@ import RSSFetch from "../components/RSSReader/RSSFetch.jsx";
 import RSSMenu from "../components/RSSReader/RSSMenu.jsx";
 
 const RSSFeed = () => {
-    const [currentUrl, setCurrentUrl] = useState("https://raw.githubusercontent.com/yottalogical/hello-internet-archive/master/HelloInternetArchive.rss");
-    const [rssUrlInput, setRssUrlInput] = useState(currentUrl);
+    const [currentUrl, setCurrentUrl] = useState("");
+    const [rssUrlInput, setRssUrlInput] = useState("");
     const [rss_feeds, setRssFeeds] = useState([]);
 
     // Parses the server response for RSS feed URLs
@@ -62,7 +62,7 @@ const RSSFeed = () => {
         setCurrentUrl(url);
     };
 
-    const resource = RSSFetch(currentUrl);
+    const resource = currentUrl ? RSSFetch(currentUrl) : null;
 
     return (
         <div className="rss-feed-wrapper">

@@ -3,6 +3,18 @@ import "../../styles/RSSReader.css";
 import secondsToDhms from "../UtilityFunctions/secondsToDHMS";
 
 const RSSReader = ({resource, setResource}) => {
+    if (!resource) {
+        return (
+            <div className="rss-empty-state">
+                <div className="empty-icon">📡</div>
+                <div className="empty-content">
+                    <h3>No Feed Selected</h3>
+                    <p>Enter an RSS feed URL above to start exploring podcasts!</p>
+                </div>
+            </div>
+        );
+    }
+
     let totalDuration = 0;
 
     const rssFeed = resource.read();

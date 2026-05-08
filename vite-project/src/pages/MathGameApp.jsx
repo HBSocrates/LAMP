@@ -35,12 +35,15 @@ function MathGameApp() {
       case '-': sol = n1 - n2; break;
       case '*': sol = n1 * n2; break;
       case '/':
-        // Ensure no division by zero and clean integer result for the game
+        // Ensure no division by zero and allow decimals
         const divisor = n2 === 0 ? 1 : n2;
-        sol = Math.floor(n1 / divisor);
+        sol = n1 / divisor;
         break;
       default: sol = 0;
     }
+
+    // Round solution to 3 decimal places
+    sol = Math.round(sol * 1000) / 1000;
 
     setRandNum1(n1);
     setRandNum2(n2);
@@ -92,7 +95,7 @@ function MathGameApp() {
   };
 
   const validateSolution = () => {
-    if (parseInt(answer) === solution) {
+    if (parseFloat(answer) === solution) {
       const newScore = score + 1;
       setScore(newScore);
       setResponse("Correct!");
@@ -163,7 +166,7 @@ function MathGameApp() {
 
       <div className={`game-card ${animationClass}`}>
         <h1 className="game-title">Maths!</h1>
-        <p className="game-subtitle">Get as many correct in a row as you can!</p>
+        <p className="game-subtitle">Get as many correct in a row as you can!<br />(Decimal answers are rounded to 3 decimal points)</p>
 
         <div className="problem-container">
           <div className="problem-display">
