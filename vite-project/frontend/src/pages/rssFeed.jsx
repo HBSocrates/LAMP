@@ -8,6 +8,7 @@ import RSSMenu from "../components/RSSReader/RSSMenu.jsx";
 const RSSFeed = () => {
     const [currentUrl, setCurrentUrl] = useState("");
     const [rssUrlInput, setRssUrlInput] = useState("");
+    const [rssAuthor, setRssAuthor] = useState("");
     const [rss_feeds, setRssFeeds] = useState([]);
 
     // Parses the server response for RSS feed URLs
@@ -43,6 +44,24 @@ const RSSFeed = () => {
                 setCurrentUrl(firstUrl);
                 setRssUrlInput(firstUrl);
             }
+        } catch (error) {
+            console.error('Error fetching feeds:', error);
+        }
+    }, [parseFeedMessage]);
+
+    const setUserRssFeed = useCallback(async () => {
+        try {
+            const response = await fetch('/api/set_rss', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    username: localStorage.getItem('username'),
+                    rss_feed_url: currentUrl
+                }),
+            });
+
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || 'RSS fetch failed');
         } catch (error) {
             console.error('Error fetching feeds:', error);
         }
@@ -89,6 +108,9 @@ const RSSFeed = () => {
                         />
                         <button className="submit-btn" onClick={handleGetFeed}>
                             Get RSS Feed
+                        </button>
+                        <button className="submit-btn" onClick={setUserRssFeed}>
+                            Save RSS Feed
                         </button>
                     </div>
                 </div>

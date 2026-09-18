@@ -55,9 +55,6 @@ class rss_feeds(db.Model):
     # RSS feed URL (required field, maximum 300 characters)
     rss_url = db.Column(db.String(300), nullable=False)
 
-    # RSS feed author (required field, maximum 100 characters)
-    rss_author = db.Column(db.String(100), nullable=False)
-
     # String representation of the RSS feed object
     def __repr__(self):
         return f'<rss_feeds {self.rss_url}>'
@@ -218,14 +215,13 @@ def get_rss():
 def set_rss():
     username = request.form['username']
     rss_feed_url = request.form['rss_feed_url']
-    rss_author = request.form['rss_author']
     print('Received request to set RSS feed for user:', username, 'to', rss_feed_url, file=sys.stderr)
     user = db.session.execute(db.select(users_template).filter_by(username=username)).scalars().all()
 
     if user:
         rss = db.session.execute(db.select(rss_feeds).filter_by(username=username)).scalars().all()
         if not rss:
-            new_rss = rss_feeds(id=1, username=username, rss_url=rss_feed_url, rss_author=rss_author)
+            new_rss = rss_feeds(id=1, username=username, rss_url=rss_feed_url)
             db.session.add(new_rss)
             db.session.commit()
             print('RSS feed URL set for user:', username, '- RSS feed URL:', rss_feed_url, file=sys.stderr)
@@ -236,7 +232,7 @@ def set_rss():
             print('RSS feed URL already exists for user:', username, '- RSS feed URL:', rss_feed_url, file=sys.stderr)
             return jsonify({'message': 'RSS feed URL already exists'})
         
-        new_rss = rss_feeds(username=username, rss_url=rss_feed_url, rss_author=rss_author)
+        new_rss = rss_feeds(username=username, rss_url=rss_feed_url)
         db.session.add(new_rss)
         db.session.commit()
         print('RSS feed URL added for user:', username, '- new RSS feed URL:', rss_feed_url, file=sys.stderr)
