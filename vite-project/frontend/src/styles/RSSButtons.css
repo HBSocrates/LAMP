@@ -10,7 +10,7 @@
 
 .rss-menu {
     position: fixed;
-    top: 2rem;
+    bottom: 2rem;
     right: 2rem;
     width: 280px;
     z-index: 1000;

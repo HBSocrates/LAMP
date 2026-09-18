@@ -9,8 +9,6 @@
 }
 
 .rss-feed-wrapper {
-    bottom: 2rem;
-    right: 2rem;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
