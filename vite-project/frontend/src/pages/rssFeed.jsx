@@ -50,8 +50,6 @@ const RSSFeed = () => {
 
     const setUserRssFeed = useCallback(async () => {
         let rssUrl = document.getElementById("rss-url-input")
-        console.log("Setting RSS feed to ", rssUrl)
-        console.log("Setting RSS feed to ", rssUrl.value)
         try {
             const response = await fetch('/api/set_rss', {
                 method: 'POST',
@@ -67,6 +65,7 @@ const RSSFeed = () => {
         } catch (error) {
             console.error('Error fetching feeds:', error);
         }
+        setCurrentUrl(rssUrl)
     }, [parseFeedMessage]);
 
     useEffect(() => {
