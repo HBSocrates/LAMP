@@ -4,7 +4,7 @@
       "root": "frontend/"
     },
     "my_backend": {
-      "root": "backend/",
+      "root": "api/",
       "entrypoint": "main:app"
     }
   },
