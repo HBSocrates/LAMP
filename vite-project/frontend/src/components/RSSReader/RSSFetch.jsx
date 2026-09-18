@@ -17,13 +17,6 @@ const RSSFetch = (rssUrl) => {
         if (error.response) {
             status = "error";
             result = error.response.data;
-            return {
-                read(){
-                    if (status === "error"){
-                        throw result;
-                    }
-                }
-            }
         }
     })
     .then(
@@ -42,7 +35,7 @@ const RSSFetch = (rssUrl) => {
             if (status === "pending") {
                 throw suspender;
             } else if (status === "error") {
-                throw result;
+                return result;
             } else if (status === "success") {
                 return result;
             }
