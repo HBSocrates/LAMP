@@ -49,14 +49,14 @@ const RSSFeed = () => {
     }, [parseFeedMessage]);
 
     const setUserRssFeed = useCallback(async () => {
-        console.log("Setting RSS feed to ", currentUrl)
+        console.log("Setting RSS feed to ", rssUrlInput)
         try {
             const response = await fetch('/api/set_rss', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({
                     username: localStorage.getItem('username'),
-                    rss_feed_url: currentUrl
+                    rss_feed_url: rssUrlInput
                 }),
             });
 
