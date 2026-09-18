@@ -57,7 +57,7 @@ const RSSFeed = () => {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({
                     username: localStorage.getItem('username'),
-                    rss_feed_url: rssUrlInput
+                    rss_feed_url: rssUrl
                 }),
             });
 
