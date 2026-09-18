@@ -5,7 +5,7 @@
     },
     "my_backend": {
       "root": "api/",
-      "entrypoint": "main:app"
+      "entrypoint": "app:app"
     }
   },
   "rewrites": [
