@@ -17,6 +17,13 @@ const RSSFetch = (rssUrl) => {
         if (error.response) {
             status = "error";
             result = error.response.data;
+            return {
+                read(){
+                    if (status === "error"){
+                        throw result;
+                    }
+                }
+            }
         }
     })
     .then(
