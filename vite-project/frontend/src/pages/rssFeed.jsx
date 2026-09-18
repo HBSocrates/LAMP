@@ -80,8 +80,6 @@ const RSSFeed = () => {
 
     const handleSetResource = (url) => {
         setCurrentUrl(url);
-        rssUrl = url
-        console.log(rssUrl)
     };
 
     const resource = currentUrl ? RSSFetch(currentUrl) : null;
