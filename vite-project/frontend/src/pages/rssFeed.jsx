@@ -9,7 +9,6 @@ const RSSFeed = () => {
     const [currentUrl, setCurrentUrl] = useState("");
     const [rssUrlInput, setRssUrlInput] = useState("");
     const [rss_feeds, setRssFeeds] = useState([]);
-    var rssUrl = ''
 
     // Parses the server response for RSS feed URLs
     const parseFeedMessage = useCallback((message) => {
@@ -50,14 +49,15 @@ const RSSFeed = () => {
     }, [parseFeedMessage]);
 
     const setUserRssFeed = useCallback(async () => {
-        console.log("Setting RSS feed to ", rssUrl)
+        let rssUrl = document.getElementsByClassName("rss-url-input")
+        console.log("Setting RSS feed to ", rssUrl.value)
         try {
             const response = await fetch('/api/set_rss', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({
                     username: localStorage.getItem('username'),
-                    rss_feed_url: rssUrl
+                    rss_feed_url: rssUrl.value
                 }),
             });
 
@@ -105,7 +105,7 @@ const RSSFeed = () => {
                             className="rss-url-input"
                             value={rssUrlInput}
                             onChange={
-                                (e) => {rssUrl = e.target.value; console.log(e.target.value); setRssUrlInput(e.target.value)}
+                                (e) => {setRssUrlInput(e.target.value)}
                             }
                             placeholder="Enter RSS Feed URL..."
                         />
