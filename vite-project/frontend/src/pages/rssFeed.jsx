@@ -9,6 +9,7 @@ const RSSFeed = () => {
     const [currentUrl, setCurrentUrl] = useState("");
     const [rssUrlInput, setRssUrlInput] = useState("");
     const [rss_feeds, setRssFeeds] = useState([]);
+    var rssUrl = '';
 
     // Parses the server response for RSS feed URLs
     const parseFeedMessage = useCallback((message) => {
@@ -49,7 +50,7 @@ const RSSFeed = () => {
     }, [parseFeedMessage]);
 
     const setUserRssFeed = useCallback(async () => {
-        console.log("Setting RSS feed to ", rssUrlInput)
+        console.log("Setting RSS feed to ", rssUrl)
         try {
             const response = await fetch('/api/set_rss', {
                 method: 'POST',
@@ -75,6 +76,7 @@ const RSSFeed = () => {
 
     const handleGetFeed = () => {
         setCurrentUrl(rssUrlInput);
+        rssUrl = rssUrlInput;
     };
 
     const handleSetResource = (url) => {
