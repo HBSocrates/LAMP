@@ -76,9 +76,12 @@ const RSSReader = ({resource, setResource}) => {
                                 </div>
                             </div>
                         </div>
-                        <a href={item.link} target="_blank" rel="noopener noreferrer" className="item-link-btn">
-                            Listen Now
-                        </a>
+                        <audio 
+                            src={item.link}
+                            controls 
+                            autoPlay={false}
+                            loop={false}
+                        />
                     </div>
                 ))}
             </div>
