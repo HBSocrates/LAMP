@@ -133,8 +133,8 @@ def login():
     hash = db.session.execute(func.crypt(passString, func.gen_salt('md5'))).scalars().all()
     passHash = db.session.execute(func.crypt(passString, selectedUsers[0].password)).scalars().all()
 
-    print('Computed hash for provided password:', hash[0] if hash else 'None', file=sys.stderr)
-    print('Stored hash for user:', selectedUsers[0].password if selectedUsers else 'None', file=sys.stderr)
+    # print('Computed hash for provided password:', hash[0] if hash else 'None', file=sys.stderr)
+    # print('Stored hash for user:', selectedUsers[0].password if selectedUsers else 'None', file=sys.stderr)
 
     if selectedUsers and hash and passHash:
         if selectedUsers[0].password == passHash[0]:
