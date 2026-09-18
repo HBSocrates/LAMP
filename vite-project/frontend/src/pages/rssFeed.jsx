@@ -105,7 +105,7 @@ const RSSFeed = () => {
                             className="rss-url-input"
                             value={rssUrlInput}
                             onChange={
-                                (e) => {setRssUrlInput(e.target.value); rssUrl = e.target.value}
+                                (e) => {rssUrl = e.target.value; setRssUrlInput(e.target.value)}
                             }
                             placeholder="Enter RSS Feed URL..."
                         />
