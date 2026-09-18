@@ -30,6 +30,8 @@ const RSSFetch = (rssUrl) => {
         }
     );
 
+    console.log(result)
+
     return {
         read() {
             if (status === "pending") {
