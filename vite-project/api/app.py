@@ -127,7 +127,7 @@ def get_data():
 def login():
     loginUser = request.form['username']
     passString = request.form['password']
-    selectedUsers = db.session.execute(db.select(users_template).filter_by(username='test')).scalars().all()
+    selectedUsers = db.session.execute(db.select(users_template).filter_by(username=loginUser)).scalars().all()
     print('Received login attempt for user:', loginUser, file=sys.stderr)
 
     hash = db.session.execute(func.crypt(passString, func.gen_salt('md5'))).scalars().all()
