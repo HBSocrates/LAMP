@@ -50,6 +50,7 @@ const RSSFeed = () => {
 
     const setUserRssFeed = useCallback(async () => {
         let rssUrl = document.getElementsByClassName("rss-url-input")
+        console.log("Setting RSS feed to ", rssUrl)
         console.log("Setting RSS feed to ", rssUrl.value)
         try {
             const response = await fetch('/api/set_rss', {
