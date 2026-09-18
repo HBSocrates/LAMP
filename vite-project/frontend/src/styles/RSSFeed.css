@@ -13,10 +13,11 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 2rem;
+    padding: 1rem;
     color: var(--text-main);
     background-color: var(--bg-color);
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    width: 100%;
 }
 
 .rss-main-container {
