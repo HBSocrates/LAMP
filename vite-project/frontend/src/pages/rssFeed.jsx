@@ -65,7 +65,6 @@ const RSSFeed = () => {
         } catch (error) {
             console.error('Error fetching feeds:', error);
         }
-        setCurrentUrl(rssUrl)
     }, [parseFeedMessage]);
 
     useEffect(() => {
