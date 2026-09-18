@@ -8,7 +8,6 @@ import RSSMenu from "../components/RSSReader/RSSMenu.jsx";
 const RSSFeed = () => {
     const [currentUrl, setCurrentUrl] = useState("");
     const [rssUrlInput, setRssUrlInput] = useState("");
-    const [rssAuthor, setRssAuthor] = useState("");
     const [rss_feeds, setRssFeeds] = useState([]);
 
     // Parses the server response for RSS feed URLs
@@ -50,14 +49,14 @@ const RSSFeed = () => {
     }, [parseFeedMessage]);
 
     const setUserRssFeed = useCallback(async () => {
-        console.log(resource)
+        console.log("Setting RSS feed to ", currentUrl)
         try {
             const response = await fetch('/api/set_rss', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({
                     username: localStorage.getItem('username'),
-                    rss_feed_url: resource
+                    rss_feed_url: currentUrl
                 }),
             });
 
