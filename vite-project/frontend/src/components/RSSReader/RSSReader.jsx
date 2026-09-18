@@ -76,7 +76,7 @@ const RSSReader = ({resource, setResource}) => {
                                 </div>
                             </div>
                         </div>
-                        <audio 
+                        <audio className="podcast-player"
                             src={item.link}
                             controls 
                             autoPlay={false}
