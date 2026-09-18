@@ -49,7 +49,7 @@ const RSSFeed = () => {
     }, [parseFeedMessage]);
 
     const setUserRssFeed = useCallback(async () => {
-        let rssUrl = document.getElementsByClassName("rss-url-input")
+        let rssUrl = document.getElementsById("rss-url-input")
         console.log("Setting RSS feed to ", rssUrl)
         console.log("Setting RSS feed to ", rssUrl.value)
         try {
@@ -105,6 +105,7 @@ const RSSFeed = () => {
                         <input
                             className="rss-url-input"
                             value={rssUrlInput}
+                            id="rss-url-input"
                             onChange={
                                 (e) => {setRssUrlInput(e.target.value)}
                             }
