@@ -16,6 +16,7 @@ const RSSFetch = (rssUrl) => {
     .catch(function (error) {
         if (error.response) {
             status = "error";
+            console.log("error: ", error)
             result = error.response.data;
         }
     })
@@ -30,7 +31,6 @@ const RSSFetch = (rssUrl) => {
         }
     );
 
-    console.log(result)
 
     return {
         read() {
