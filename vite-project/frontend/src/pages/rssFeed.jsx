@@ -4,27 +4,24 @@ import '../styles/RSSFeed.css'
 import RSSReader from "../components/RSSReader/RSSReader.jsx";
 import RSSFetch from "../components/RSSReader/RSSFetch.jsx";
 import RSSMenu from "../components/RSSReader/RSSMenu.jsx";
+import Axios from "axios";
+
+const rss2jsonProxyUrl = "https://api.rss2json.com/v1/api.json?rss_url=";
+const rss2jsonApiKey = "tueaj0vocku3c88jt64ffztwnbz3e3vqshlyzwst";
 
 const RSSFeed = () => {
     const [currentUrl, setCurrentUrl] = useState("");
     const [rssUrlInput, setRssUrlInput] = useState("");
-    const [rss_feeds, setRssFeeds] = useState([]);
+    const [rssFeeds, setRssFeeds] = useState([]);
 
-    // Parses the server response for RSS feed URLs
-    const parseFeedMessage = useCallback((message) => {
-        if (!message || message === 'None') return null;
+    // Stores the list of { url, title } pairs returned by the server
+    const parseFeedMessage = useCallback((feeds) => {
+        if (!feeds || feeds.length === 0) return null;
 
-        console.log('Parsing message:', message);
-        const cleaned = message
-            .replace(/([<]rss_feeds )/g, '')
-            .replace(/\[/g, '')
-            .replace(/>]/g, '');
+        console.log('Parsing feeds:', feeds);
+        setRssFeeds(feeds);
 
-        const rss_urls = cleaned.split('>,').filter(url => url.trim() !== "");
-        console.log('Parsed RSS feed URLs:', rss_urls);
-        setRssFeeds(rss_urls);
-
-        return rss_urls.length > 0 ? rss_urls[0] : null;
+        return feeds.length > 0 ? feeds[0].url : null;
     }, []);
 
     const fetchUserRSSFeeds = useCallback(async () => {
@@ -38,7 +35,7 @@ const RSSFeed = () => {
             const data = await response.json();
             if (!response.ok) throw new Error(data.message || 'RSS fetch failed');
 
-            const firstUrl = parseFeedMessage(data.message);
+            const firstUrl = parseFeedMessage(data.feeds || []);
             if (firstUrl) {
                 setCurrentUrl(firstUrl);
                 setRssUrlInput(firstUrl);
@@ -49,14 +46,29 @@ const RSSFeed = () => {
     }, [parseFeedMessage]);
 
     const setUserRssFeed = useCallback(async () => {
-        let rssUrl = document.getElementById("rss-url-input")
+        const rssInput = document.getElementById("rss-url-input")
+        const rssUrl = rssInput ? rssInput.value : '';
+        if (!rssUrl) return;
         try {
+            let rssTitle = rssUrl;
+            try {
+                const titleResponse = await Axios.get(
+                    `${rss2jsonProxyUrl}${encodeURIComponent(rssUrl)}&api_key=${rss2jsonApiKey}&count=1`
+                );
+                if (titleResponse.data?.feed?.title) {
+                    rssTitle = titleResponse.data.feed.title;
+                }
+            } catch (titleError) {
+                console.error('Error fetching feed title:', titleError);
+            }
+
             const response = await fetch('/api/set_rss', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({
                     username: localStorage.getItem('username'),
-                    rss_feed_url: rssUrl.value
+                    rss_feed_url: rssUrl,
+                    rss_title: rssTitle,
                 }),
             });
 
@@ -83,8 +95,8 @@ const RSSFeed = () => {
         <div className="rss-feed-wrapper">
             {localStorage.getItem('loggedIn') === 'true' && (
                 <RSSMenu
-                    titles={rss_feeds}
-                    rss_feeds={rss_feeds}
+                    titles={rssFeeds.map((feed) => feed.title)}
+                    rss_feeds={rssFeeds.map((feed) => feed.url)}
                     name="Your RSS Feeds"
                     setCurrentUrl={setCurrentUrl}
                 />

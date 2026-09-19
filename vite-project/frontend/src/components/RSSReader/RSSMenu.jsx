@@ -17,7 +17,7 @@ const RSSMenu = ({titles, rss_feeds, name, setCurrentUrl}) => {
     const RSSButtons = titles.map((item, index) => {
         return (
         <RSSButton
-            key={item}
+            key={rss_feeds[index] || index}
             title={item.length > 40 ? item.substring(0, 40) + "..." : item}
             isActive={currentlyActive === index + 1}
             onClick={() => handleRSSButtonClick(index + 1)}

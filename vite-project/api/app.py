@@ -55,6 +55,9 @@ class rss_feeds(db.Model):
     # RSS feed URL (required field, maximum 300 characters)
     rss_url = db.Column(db.String(300), nullable=False)
 
+    # RSS feed title (optional, maximum 200 characters)
+    rss_title = db.Column(db.String(200), nullable=True)
+
     # String representation of the RSS feed object
     def __repr__(self):
         return f'<rss_feeds {self.rss_url}>'
@@ -201,27 +204,29 @@ def get_rss():
     user = db.session.execute(db.select(users_template).filter_by(username=username)).scalars().all()
 
     if user:
-        user = db.session.execute(db.select(rss_feeds).filter_by(username=username)).scalars().all()
-        print('User found for username:', username, '- RSS feed URL:', user, file=sys.stderr)
-        if (len(user) == 0):
+        feeds = db.session.execute(db.select(rss_feeds).filter_by(username=username)).scalars().all()
+        if (len(feeds) == 0):
             print('No RSS feed found for user:', username, file=sys.stderr)
-            return jsonify({'message': 'None'})
-        return jsonify({'message': f'{user}'})
+            return jsonify({'feeds': []})
+        feed_list = [{'url': feed.rss_url, 'title': feed.rss_title or feed.rss_url} for feed in feeds]
+        print('User found for username:', username, '- RSS feeds:', feed_list, file=sys.stderr)
+        return jsonify({'feeds': feed_list})
     
     print('User not found for username:', username, file=sys.stderr)
-    return jsonify({'message': 'User not found'})
+    return jsonify({'feeds': [], 'message': 'User not found'})
 
 @app.route('/api/set_rss', methods=['POST'])
 def set_rss():
     username = request.form['username']
     rss_feed_url = request.form['rss_feed_url']
+    rss_feed_title = request.form.get('rss_title', '') or rss_feed_url
     print('Received request to set RSS feed for user:', username, 'to', rss_feed_url, file=sys.stderr)
     user = db.session.execute(db.select(users_template).filter_by(username=username)).scalars().all()
 
     if user:
         rss = db.session.execute(db.select(rss_feeds).filter_by(username=username)).scalars().all()
         if not rss:
-            new_rss = rss_feeds(id=1, username=username, rss_url=rss_feed_url)
+            new_rss = rss_feeds(id=1, username=username, rss_url=rss_feed_url, rss_title=rss_feed_title)
             db.session.add(new_rss)
             db.session.commit()
             print('RSS feed URL set for user:', username, '- RSS feed URL:', rss_feed_url, file=sys.stderr)
@@ -229,10 +234,16 @@ def set_rss():
 
         url_check = db.session.execute(db.select(rss_feeds).filter_by(username=username, rss_url=rss_feed_url)).scalars().all()
         if url_check:
+            existing = url_check[0]
+            if not existing.rss_title:
+                existing.rss_title = rss_feed_title
+                db.session.commit()
+                print('RSS feed title backfilled for user:', username, '- RSS feed URL:', rss_feed_url, file=sys.stderr)
+                return jsonify({'message': 'RSS feed URL updated'})
             print('RSS feed URL already exists for user:', username, '- RSS feed URL:', rss_feed_url, file=sys.stderr)
             return jsonify({'message': 'RSS feed URL already exists'})
         
-        new_rss = rss_feeds(username=username, rss_url=rss_feed_url)
+        new_rss = rss_feeds(username=username, rss_url=rss_feed_url, rss_title=rss_feed_title)
         db.session.add(new_rss)
         db.session.commit()
         print('RSS feed URL added for user:', username, '- new RSS feed URL:', rss_feed_url, file=sys.stderr)
