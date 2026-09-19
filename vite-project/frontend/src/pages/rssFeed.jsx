@@ -37,8 +37,8 @@ const RSSFeed = () => {
 
             const firstUrl = parseFeedMessage(data.feeds || []);
             if (firstUrl) {
-                setCurrentUrl(firstUrl);
-                setRssUrlInput(firstUrl);
+                setCurrentUrl((prevUrl) => prevUrl || firstUrl);
+                setRssUrlInput((prevInput) => prevInput || firstUrl);
             }
         } catch (error) {
             console.error('Error fetching feeds:', error);
@@ -74,10 +74,12 @@ const RSSFeed = () => {
 
             const data = await response.json();
             if (!response.ok) throw new Error(data.message || 'RSS fetch failed');
+
+            await fetchUserRSSFeeds();
         } catch (error) {
             console.error('Error fetching feeds:', error);
         }
-    }, []);
+    }, [fetchUserRSSFeeds]);
 
     useEffect(() => {
         if (localStorage.getItem('loggedIn') === 'true') {
