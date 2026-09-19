@@ -42,19 +42,19 @@ const getSizeDimensions = (size) => {
   return dims[size]
 }
 
-const snapToGrid = (x, y, pieceSize) => {
+const getSnapCell = (x, y, pieceSize) => {
   const dim = getSizeDimensions(pieceSize)
-  const snappedX = Math.round((x + dim / 2) / CELL_SIZE) * CELL_SIZE
-  const snappedY = Math.round((y + dim / 2) / CELL_SIZE) * CELL_SIZE
-  return { snappedX, snappedY }
+  const cellX = Math.floor((x + dim / 2) / CELL_SIZE)
+  const cellY = Math.floor((y + dim / 2) / CELL_SIZE)
+  return { cellX, cellY }
 }
 
-const isWithinBoard = (x, y) => {
+const isWithinBoard = (cellX, cellY) => {
   return (
-    x >= 0 &&
-    x < GRID_SIZE * CELL_SIZE &&
-    y >= 0 &&
-    y < GRID_SIZE * CELL_SIZE
+    cellX >= 0 &&
+    cellX < GRID_SIZE &&
+    cellY >= 0 &&
+    cellY < GRID_SIZE
   )
 }
 
@@ -365,16 +365,18 @@ function RussianJiangi() {
     const updatedPieces = pieces.map((p) => {
       if (p.id !== draggingPiece) return p
 
-      const { snappedX, snappedY } = snapToGrid(relX, relY, p.size)
+      const { cellX, cellY } = getSnapCell(relX, relY, p.size)
+      const snappedX = cellX * CELL_SIZE
+      const snappedY = cellY * CELL_SIZE
       const start = getStartingPosition(p.id % PIECES_PER_PLAYER)
       const originalBoardPosition = dragStartData?.boardPosition
       const originalPlaced = dragStartData?.placed
 
-      if (isWithinBoard(snappedX, snappedY)) {
+      if (isWithinBoard(cellX, cellY)) {
         const topPiece = getTopPieceAtPosition(
           pieces.filter((other) => other.id !== draggingPiece),
-          snappedX / CELL_SIZE,
-          snappedY / CELL_SIZE
+          cellX,
+          cellY
         )
         const currentPieceSize = getSizeValue(p.size)
 
@@ -392,7 +394,7 @@ function RussianJiangi() {
             x: snappedX + offsetX,
             y: snappedY + offsetY,
             placed: true,
-            boardPosition: { x: snappedX / CELL_SIZE, y: snappedY / CELL_SIZE },
+            boardPosition: { x: cellX, y: cellY },
           }
         }
       }
@@ -432,8 +434,8 @@ function RussianJiangi() {
         }
       }
     } else {
-      const { snappedX, snappedY } = snapToGrid(relX, relY, draggedPiece?.size)
-      if (isWithinBoard(snappedX, snappedY)) {
+      const { cellX, cellY } = getSnapCell(relX, relY, draggedPiece?.size)
+      if (isWithinBoard(cellX, cellY)) {
         try {
           const response = await fetch('/api/game/move', {
             method: 'POST',
@@ -442,8 +444,8 @@ function RussianJiangi() {
               game_id: gameId,
               username: username,
               piece_id: draggingPiece,
-              x: snappedX / CELL_SIZE,
-              y: snappedY / CELL_SIZE,
+              x: cellX,
+              y: cellY,
             }),
           })
 

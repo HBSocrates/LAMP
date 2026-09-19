@@ -1,7 +1,18 @@
 import React from "react";
-import { Nav, NavLink, Bars, NavMenu, NavBtn, NavBtnLink } from "./NavBarElements";
+import { useNavigate } from "react-router-dom";
+import { Nav, NavLink, Bars, NavMenu, NavBtn, NavBtnLink, LogoutButton } from "./NavBarElements";
+
+const isLoggedIn = () => localStorage.getItem('loggedIn') === 'true';
 
 const Navbar = () => {
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        localStorage.removeItem('loggedIn');
+        localStorage.removeItem('username');
+        navigate('/');
+    };
+
     return (
         <>
             <Nav>
@@ -16,20 +27,26 @@ const Navbar = () => {
                     <NavLink to="/rssFeed" >
                         Podcast RSS Feed
                     </NavLink>
-                    <NavLink to="/about" >
-                        About Me
-                    </NavLink>
                     <NavLink to="/RussianJiangi">
                         Russian Jiangi
                     </NavLink>
-                    <NavLink to="/signUp">
-                        Sign Up
+                    <NavLink to="/about" >
+                        About Me
                     </NavLink>
+                    {!isLoggedIn() && (
+                        <NavLink to="/signUp">
+                            Sign Up
+                        </NavLink>
+                    )}
                 </NavMenu>
                 <NavBtn>
-                    <NavBtnLink to="/LogIn">
-                        Log In
-                    </NavBtnLink>
+                    {isLoggedIn() ? (
+                        <LogoutButton onClick={handleLogout}>Log Out</LogoutButton>
+                    ) : (
+                        <NavBtnLink to="/login">
+                            Log In
+                        </NavBtnLink>
+                    )}
                 </NavBtn>
             </Nav>
         </>

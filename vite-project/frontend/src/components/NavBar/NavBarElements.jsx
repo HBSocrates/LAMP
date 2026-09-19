@@ -73,3 +73,22 @@ export const NavBtnLink = styled(Link)`
         color: #808080;
     }
 `;
+
+export const LogoutButton = styled.button`
+    border-radius: 4px;
+    background: #808080;
+    padding: 10px 22px;
+    color: #000000;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    text-decoration: none;
+    margin-left: 24px;
+    font: inherit;
+    &:hover {
+        transition: all 0.2s ease-in-out;
+        background: #ffffff93;
+        color: #808080;
+    }
+`;
