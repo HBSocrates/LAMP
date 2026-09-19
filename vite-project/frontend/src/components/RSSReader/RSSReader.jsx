@@ -18,7 +18,9 @@ const RSSReader = ({resource, setResource}) => {
     let totalDuration = 0;
 
     const rssFeed = resource.read();
-    console.log('Fetched RSS feed:', rssFeed.feed.title);
+    if (rssFeed.status == "ok") {
+        console.log('Fetched RSS feed:', rssFeed.feed.title);
+    }
 
     if (rssFeed.status !== "ok") {
         return (
