@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import "../../styles/RSSReader.css";
 import secondsToDhms from "../UtilityFunctions/secondsToDHMS";
 
+const ITEMS_PER_PAGE = 51;
+
 const RSSReader = ({resource}) => {
+    const [currentPage, setCurrentPage] = useState(0);
+
     if (!resource) {
         return (
             <div className="rss-empty-state">
@@ -45,6 +49,13 @@ const RSSReader = ({resource}) => {
         0
     );
 
+    const totalPages = Math.max(1, Math.ceil(feedItems.length / ITEMS_PER_PAGE));
+    const safePage = Math.min(currentPage, totalPages - 1);
+    const pageItems = feedItems.slice(
+        safePage * ITEMS_PER_PAGE,
+        (safePage + 1) * ITEMS_PER_PAGE
+    );
+
     return (
         <div className="rss-reader">
             <div className="feed-header">
@@ -56,7 +67,7 @@ const RSSReader = ({resource}) => {
             </div>
 
             <div className="rss-items-grid">
-                {feedItems.map((item, index) => (
+                {pageItems.map((item, index) => (
                     <div className="rss-item-card" key={index}>
                         <div className="item-content">
                             <h2 className="item-title">
@@ -82,6 +93,28 @@ const RSSReader = ({resource}) => {
                     </div>
                 ))}
             </div>
+
+            {totalPages > 1 && (
+                <div className="pagination-controls">
+                    <button
+                        className="pagination-btn"
+                        onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
+                        disabled={safePage === 0}
+                    >
+                        Previous
+                    </button>
+                    <span className="pagination-info">
+                        Page {safePage + 1} of {totalPages}
+                    </span>
+                    <button
+                        className="pagination-btn"
+                        onClick={() => setCurrentPage((p) => Math.min(totalPages - 1, p + 1))}
+                        disabled={safePage >= totalPages - 1}
+                    >
+                        Next
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

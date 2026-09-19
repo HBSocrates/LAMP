@@ -115,7 +115,7 @@ const RSSFeed = () => {
                 </div>
 
                 <Suspense fallback={<div className="loading-state">Loading feed...</div>}>
-                    <RSSReader resource={resource}/>
+                    <RSSReader key={currentUrl} resource={resource}/>
                 </Suspense>
             </div>
         </div>
