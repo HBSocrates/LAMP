@@ -321,8 +321,8 @@ function RussianJiangi() {
       placed: piece.placed,
     })
     setOffset({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x: e.clientX,
+      y: e.clientY,
     })
   }
 
