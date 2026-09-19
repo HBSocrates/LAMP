@@ -321,8 +321,8 @@ function RussianJiangi() {
       placed: piece.placed,
     })
     setOffset({
-      x: e.clientX - rect.right,
-      y: e.clientY - rect.bottom,
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
     })
   }
 
@@ -341,8 +341,8 @@ function RussianJiangi() {
     const containerRect = document.getElementById('jiangi-game-root').getBoundingClientRect()
 
     // Calculate piece position relative to the board using the current drag position
-    const relX = dragPos.x - (boardRect.right - containerRect.right)
-    const relY = dragPos.y - (boardRect.bottom - containerRect.bottom)
+    const relX = dragPos.x - (boardRect.left - containerRect.left)
+    const relY = dragPos.y - (boardRect.top - containerRect.top)
 
     const updatedPieces = pieces.map((p) => {
       if (p.id !== draggingPiece) return p
