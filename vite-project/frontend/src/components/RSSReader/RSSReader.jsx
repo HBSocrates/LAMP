@@ -2,7 +2,7 @@ import React from "react";
 import "../../styles/RSSReader.css";
 import secondsToDhms from "../UtilityFunctions/secondsToDHMS";
 
-const RSSReader = ({resource, setResource}) => {
+const RSSReader = ({resource}) => {
     if (!resource) {
         return (
             <div className="rss-empty-state">
@@ -14,8 +14,6 @@ const RSSReader = ({resource, setResource}) => {
             </div>
         );
     }
-
-    let totalDuration = 0;
 
     const rssFeed = resource.read();
     if (rssFeed.status == "ok") {
@@ -34,21 +32,18 @@ const RSSReader = ({resource, setResource}) => {
         );
     }
 
-    function extractFeedItems(jsonItems, feedTitle) {
-        const feedItems = [];
-        for (let i = 0; i < jsonItems.length; i++) {
-            const author = feedTitle;
-            const title = jsonItems[i].title;
-            const link = jsonItems[i].enclosure.link;
-            const duration = secondsToDhms(jsonItems[i].enclosure.duration);
-            totalDuration += jsonItems[i].enclosure.duration;
-            const pubDate = jsonItems[i].pubDate;
-            feedItems.push({ author, title, link, duration, pubDate });
-        }
-        return feedItems;
-    }
+    const feedItems = rssFeed.items.map((item) => ({
+        author: rssFeed.feed.title,
+        title: item.title,
+        link: item.enclosure.link,
+        duration: secondsToDhms(item.enclosure.duration),
+        pubDate: item.pubDate,
+    }));
 
-    const feedItems = extractFeedItems(rssFeed.items, rssFeed.feed.title);
+    const totalDuration = rssFeed.items.reduce(
+        (sum, item) => sum + Number(item.enclosure.duration),
+        0
+    );
 
     return (
         <div className="rss-reader">

@@ -1,4 +1,5 @@
 .russian-jiangi-container {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -117,8 +118,8 @@
 .puzzle-board {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
+  grid-template-columns: repeat(3, 100px);
+  grid-template-rows: repeat(3, 100px);
   gap: 0;
   background-color: #1a1a1a;
   border: 4px solid #333;

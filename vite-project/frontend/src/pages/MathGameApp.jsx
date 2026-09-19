@@ -3,13 +3,44 @@ import '../styles/App.css'
 import '../styles/MathGame.css'
 import { operandsList } from '../mathOperands.js';
 
+function createProblem(minVal, maxVal) {
+  const min = Number(minVal);
+  const max = Number(maxVal);
+  const range = max - min + 1;
+
+  const n1 = Math.floor(Math.random() * range) + min;
+  const n2 = Math.floor(Math.random() * range) + min;
+  const op = operandsList[Math.floor(Math.random() * operandsList.length)];
+
+  let sol = 0;
+  switch (op.name) {
+    case '+': sol = n1 + n2; break;
+    case '-': sol = n1 - n2; break;
+    case '*': sol = n1 * n2; break;
+    case '/': {
+      // Ensure no division by zero and allow decimals
+      const divisor = n2 === 0 ? 1 : n2;
+      sol = n1 / divisor;
+      break;
+    }
+    default: sol = 0;
+  }
+
+  // Round solution to 3 decimal places
+  sol = Math.round(sol * 1000) / 1000;
+
+  return { n1, n2, op, sol };
+}
+
 function MathGameApp() {
   const inputRef = useRef(null);
 
-  const [randNum1, setRandNum1] = useState(0);
-  const [randNum2, setRandNum2] = useState(0);
-  const [randOperand, setRandOperand] = useState(operandsList[0]);
-  const [solution, setSolution] = useState(0);
+  const [problem, setProblem] = useState(() =>
+    createProblem(
+      localStorage.getItem('min') || -12,
+      localStorage.getItem('max') || 12
+    )
+  );
   const [answer, setAnswer] = useState("");
   const [response, setResponse] = useState("");
   const [score, setScore] = useState(0);
@@ -20,64 +51,33 @@ function MathGameApp() {
   const [animationClass, setAnimationClass] = useState("");
 
   const generateProblem = useCallback(() => {
-    const minVal = Number(min);
-    const maxVal = Number(max);
-    const range = maxVal - minVal + 1;
-
-    const n1 = Math.floor(Math.random() * range) + minVal;
-    const n2 = Math.floor(Math.random() * range) + minVal;
-    const opIdx = Math.floor(Math.random() * operandsList.length);
-    const op = operandsList[opIdx];
-
-    let sol = 0;
-    switch (op.name) {
-      case '+': sol = n1 + n2; break;
-      case '-': sol = n1 - n2; break;
-      case '*': sol = n1 * n2; break;
-      case '/':
-        // Ensure no division by zero and allow decimals
-        const divisor = n2 === 0 ? 1 : n2;
-        sol = n1 / divisor;
-        break;
-      default: sol = 0;
-    }
-
-    // Round solution to 3 decimal places
-    sol = Math.round(sol * 1000) / 1000;
-
-    setRandNum1(n1);
-    setRandNum2(n2);
-    setRandOperand(op);
-    setSolution(sol);
+    setProblem(createProblem(min, max));
     setAnswer("");
   }, [min, max]);
 
   useEffect(() => {
-    generateProblem();
-    if (localStorage.getItem('loggedIn') === 'true') {
-      fetchHighScore();
+    if (localStorage.getItem('loggedIn') !== 'true') return
+    let cancelled = false
+    fetch('/api/get_score', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ username: localStorage.getItem('username') }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!cancelled && data.message) setHighScore(data.message)
+      })
+      .catch((error) => console.error('Error fetching score:', error))
+    return () => {
+      cancelled = true
     }
-  }, [generateProblem]);
+  }, []);
 
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();
     }
-  }, [randNum1, randNum2, randOperand]);
-
-  const fetchHighScore = async () => {
-    try {
-      const response = await fetch('/api/get_score', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ username: localStorage.getItem('username') }),
-      });
-      const data = await response.json();
-      if (data.message) setHighScore(data.message);
-    } catch (error) {
-      console.error('Error fetching score:', error);
-    }
-  };
+  }, [problem]);
 
   const updateHighScoreOnServer = async (newHigh) => {
     try {
@@ -95,7 +95,7 @@ function MathGameApp() {
   };
 
   const validateSolution = () => {
-    if (parseFloat(answer) === solution) {
+    if (parseFloat(answer) === problem.sol) {
       const newScore = score + 1;
       setScore(newScore);
       setResponse("Correct!");
@@ -137,6 +137,8 @@ function MathGameApp() {
     localStorage.setItem('max', maxVal);
     setMin(minVal);
     setMax(maxVal);
+    setProblem(createProblem(minVal, maxVal));
+    setAnswer("");
     setShowSettings(false);
   };
 
@@ -145,6 +147,8 @@ function MathGameApp() {
     localStorage.setItem('max', 12);
     setMin(-12);
     setMax(12);
+    setProblem(createProblem(-12, 12));
+    setAnswer("");
     const minInput = document.getElementsByName('min')[0];
     const maxInput = document.getElementsByName('max')[0];
     if (minInput) minInput.value = -12;
@@ -170,7 +174,7 @@ function MathGameApp() {
 
         <div className="problem-container">
           <div className="problem-display">
-            {randNum1} <span className="operator">{randOperand.name}</span> {randNum2} =
+            {problem.n1} <span className="operator">{problem.op.name}</span> {problem.n2} =
           </div>
 
           <div className="answer-row">

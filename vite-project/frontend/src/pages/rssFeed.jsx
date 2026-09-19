@@ -18,7 +18,7 @@ const RSSFeed = () => {
         const cleaned = message
             .replace(/([<]rss_feeds )/g, '')
             .replace(/\[/g, '')
-            .replace(/\>]/g, '');
+            .replace(/>]/g, '');
 
         const rss_urls = cleaned.split('>,').filter(url => url.trim() !== "");
         console.log('Parsed RSS feed URLs:', rss_urls);
@@ -65,7 +65,7 @@ const RSSFeed = () => {
         } catch (error) {
             console.error('Error fetching feeds:', error);
         }
-    }, [parseFeedMessage]);
+    }, []);
 
     useEffect(() => {
         if (localStorage.getItem('loggedIn') === 'true') {
@@ -75,10 +75,6 @@ const RSSFeed = () => {
 
     const handleGetFeed = () => {
         setCurrentUrl(rssUrlInput);
-    };
-
-    const handleSetResource = (url) => {
-        setCurrentUrl(url);
     };
 
     const resource = currentUrl ? RSSFetch(currentUrl) : null;
@@ -119,7 +115,7 @@ const RSSFeed = () => {
                 </div>
 
                 <Suspense fallback={<div className="loading-state">Loading feed...</div>}>
-                    <RSSReader resource={resource} setResource={handleSetResource} />
+                    <RSSReader resource={resource}/>
                 </Suspense>
             </div>
         </div>

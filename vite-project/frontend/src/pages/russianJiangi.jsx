@@ -1,37 +1,97 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import '../styles/App.css'
 import '../styles/RussianJiangi.css'
 import RussianDoll from '../assets/matryoshka-doll.svg'
 import RussianDoll2 from '../assets/matryoshka-doll2.svg'
 
-function RussianJiangi() {
-  const GRID_SIZE = 3
-  const CELL_SIZE = 100
-  const PIECES_PER_PLAYER = 6
-  const TOTAL_PIECES = PIECES_PER_PLAYER * 2
-  const START_PLAYER = 'player1'
-  const WIN_LINES = [
-    [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }],
-    [{ x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }],
-    [{ x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 }],
-    [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 0, y: 2 }],
-    [{ x: 1, y: 0 }, { x: 1, y: 1 }, { x: 1, y: 2 }],
-    [{ x: 2, y: 0 }, { x: 2, y: 1 }, { x: 2, y: 2 }],
-    [{ x: 0, y: 0 }, { x: 1, y: 1 }, { x: 2, y: 2 }],
-    [{ x: 2, y: 0 }, { x: 1, y: 1 }, { x: 0, y: 2 }],
-  ]
+const GRID_SIZE = 3
+const CELL_SIZE = 100
+const BOARD_BORDER = 4
+const PIECES_PER_PLAYER = 6
+const TOTAL_PIECES = PIECES_PER_PLAYER * 2
+const START_PLAYER = 'player1'
+const WIN_LINES = [
+  [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }],
+  [{ x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }],
+  [{ x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 }],
+  [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 0, y: 2 }],
+  [{ x: 1, y: 0 }, { x: 1, y: 1 }, { x: 1, y: 2 }],
+  [{ x: 2, y: 0 }, { x: 2, y: 1 }, { x: 2, y: 2 }],
+  [{ x: 0, y: 0 }, { x: 1, y: 1 }, { x: 2, y: 2 }],
+  [{ x: 2, y: 0 }, { x: 1, y: 1 }, { x: 0, y: 2 }],
+]
 
-  const getSizeForPiece = (index) => {
-    if (index < 2) return 'small'
-    if (index < 4) return 'medium'
-    return 'large'
+const getSizeForPiece = (index) => {
+  if (index < 2) return 'small'
+  if (index < 4) return 'medium'
+  return 'large'
+}
+
+const getStartingPosition = (index) => ({
+  x: (index % 2) * 120 + 10,
+  y: Math.floor(index / 2) * 120 + 10,
+})
+
+const getSizeValue = (size) => {
+  const sizeMap = { small: 1, medium: 2, large: 3 }
+  return sizeMap[size]
+}
+
+const getSizeDimensions = (size) => {
+  const dims = { small: 60, medium: 80, large: 100 }
+  return dims[size]
+}
+
+const snapToGrid = (x, y, pieceSize) => {
+  const dim = getSizeDimensions(pieceSize)
+  const snappedX = Math.round((x + dim / 2) / CELL_SIZE) * CELL_SIZE
+  const snappedY = Math.round((y + dim / 2) / CELL_SIZE) * CELL_SIZE
+  return { snappedX, snappedY }
+}
+
+const isWithinBoard = (x, y) => {
+  return (
+    x >= 0 &&
+    x < GRID_SIZE * CELL_SIZE &&
+    y >= 0 &&
+    y < GRID_SIZE * CELL_SIZE
+  )
+}
+
+const getTopPieceAtPosition = (pieceList, x, y) =>
+  pieceList
+    .filter(
+      (p) =>
+        p.placed &&
+        p.boardPosition &&
+        p.boardPosition.x === x &&
+        p.boardPosition.y === y
+    )
+    .sort((a, b) => getSizeValue(b.size) - getSizeValue(a.size))[0]
+
+const isValidPlacement = (piece, x, y, pieceList) => {
+  const topPiece = getTopPieceAtPosition(
+    pieceList.filter((other) => other.id !== piece.id),
+    x,
+    y
+  )
+  return !topPiece || getSizeValue(piece.size) > getSizeValue(topPiece.size)
+}
+
+const checkWinner = (pieceList) => {
+  for (const line of WIN_LINES) {
+    const firstPiece = getTopPieceAtPosition(pieceList, line[0].x, line[0].y)
+    if (!firstPiece) continue
+    const firstOwner = firstPiece.player
+    const allMatch = line.every(
+      (cell) => getTopPieceAtPosition(pieceList, cell.x, cell.y)?.player === firstOwner
+    )
+    if (allMatch) return firstOwner
   }
+  return null
+}
 
-  const getStartingPosition = (index) => ({
-    x: (index % 2) * 120 + 10,
-    y: Math.floor(index / 2) * 120 + 10,
-  })
-
+function RussianJiangi() {
   const [pieces, setPieces] = useState(
     Array.from({ length: TOTAL_PIECES }, (_, i) => {
       const playerIndex = i % PIECES_PER_PLAYER
@@ -75,7 +135,7 @@ function RussianJiangi() {
     setDragPos({ x, y })
   }
 
-  const syncGameState = async () => {
+  const syncGameState = useCallback(async () => {
     if (!gameId) return
     try {
       const response = await fetch(`/api/game/state/${gameId}`)
@@ -100,7 +160,7 @@ function RussianJiangi() {
     } catch (err) {
       console.error('Error syncing game state:', err)
     }
-  }
+  }, [gameId, onlineStatus])
 
   useEffect(() => {
     let interval
@@ -110,62 +170,9 @@ function RussianJiangi() {
     return () => {
       if (interval) clearInterval(interval)
     }
-  }, [gameMode, gameId, onlineStatus])
+  }, [gameMode, gameId, onlineStatus, syncGameState])
 
-  const snapToGrid = (x, y) => {
-    const snappedX = Math.round(x / CELL_SIZE) * CELL_SIZE
-    const snappedY = Math.round(y / CELL_SIZE) * CELL_SIZE
-    return { snappedX, snappedY }
-  }
-
-  const isWithinBoard = (x, y) => {
-    return (
-      x >= 0 &&
-      x < GRID_SIZE * CELL_SIZE &&
-      y >= 0 &&
-      y < GRID_SIZE * CELL_SIZE
-    )
-  }
-
-  const getSizeValue = (size) => {
-    const sizeMap = { small: 1, medium: 2, large: 3 }
-    return sizeMap[size]
-  }
-
-  const getTopPieceAtPosition = (pieceList, x, y) =>
-    pieceList
-      .filter(
-        (p) =>
-          p.placed &&
-          p.boardPosition &&
-          p.boardPosition.x === x &&
-          p.boardPosition.y === y
-      )
-      .sort((a, b) => getSizeValue(b.size) - getSizeValue(a.size))[0]
-
-  const isValidPlacement = (piece, x, y, pieceList) => {
-    const topPiece = getTopPieceAtPosition(
-      pieceList.filter((other) => other.id !== piece.id),
-      x,
-      y
-    )
-    return !topPiece || getSizeValue(piece.size) > getSizeValue(topPiece.size)
-  }
-
-  const checkWinner = (pieceList) => {
-    for (const line of WIN_LINES) {
-      const firstPiece = getTopPieceAtPosition(pieceList, line[0].x, line[0].y)
-      if (!firstPiece) continue
-      const firstOwner = firstPiece.player
-      const allMatch = line.every(
-        (cell) => getTopPieceAtPosition(pieceList, cell.x, cell.y)?.player === firstOwner
-      )
-      if (allMatch) return firstOwner
-    }
-    return null
-  }
-
-  const getAiMove = () => {
+  const getAiMove = useCallback(() => {
     const availablePieces = pieces.filter(
       (p) => p.player === 'player2' && !p.placed
     )
@@ -202,7 +209,6 @@ function RussianJiangi() {
 
     const evaluateBoard = (currentPieces, player) => {
       let score = 0
-      const opponent = player === 'player1' ? 'player2' : 'player1'
 
       for (const line of WIN_LINES) {
         const linePieces = line.map((coord) => getTopPieceAtPosition(currentPieces, coord.x, coord.y))
@@ -267,9 +273,9 @@ function RussianJiangi() {
     }
 
     return null
-  }
+  }, [pieces])
 
-  const executeAiMove = (piece, cell) => {
+  const executeAiMove = useCallback((piece, cell) => {
     const updatedPieces = pieces.map((p) =>
       p.id === piece.id
         ? {
@@ -288,23 +294,22 @@ function RussianJiangi() {
     } else {
       setCurrentPlayer('player1')
     }
-  }
+  }, [pieces])
 
   useEffect(() => {
     if (winner || gameMode !== 'ai' || currentPlayer !== 'player2') return
 
     const aiMove = getAiMove()
-    if (!aiMove) {
-      setCurrentPlayer('player1')
-      return
-    }
-
     const timer = setTimeout(() => {
-      executeAiMove(aiMove.piece, aiMove.cell)
+      if (aiMove) {
+        executeAiMove(aiMove.piece, aiMove.cell)
+      } else {
+        setCurrentPlayer('player1')
+      }
     }, 400)
 
     return () => clearTimeout(timer)
-  }, [currentPlayer, winner, pieces, gameMode])
+  }, [currentPlayer, winner, pieces, gameMode, getAiMove, executeAiMove])
 
   const handleMouseDown = (e, pieceId) => {
     const piece = pieces.find((p) => p.id === pieceId)
@@ -320,15 +325,20 @@ function RussianJiangi() {
       boardPosition: piece.boardPosition,
       placed: piece.placed,
     })
-    setOffset({
+    const grabbedOffset = {
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
-    })
-  }
+    }
+    setOffset(grabbedOffset)
 
-  const getSizeDimensions = (size) => {
-    const dims = { small: 60, medium: 80, large: 100 }
-    return dims[size]
+    const containerElement = document.getElementById('jiangi-game-root')
+    if (containerElement) {
+      const containerRect = containerElement.getBoundingClientRect()
+      setDragPos({
+        x: e.clientX - containerRect.left - grabbedOffset.x,
+        y: e.clientY - containerRect.top - grabbedOffset.y,
+      })
+    }
   }
 
   const handleMouseUp = async () => {
@@ -339,15 +349,23 @@ function RussianJiangi() {
     if (!boardElement) return
     const boardRect = boardElement.getBoundingClientRect()
     const containerRect = document.getElementById('jiangi-game-root').getBoundingClientRect()
+    const boardStyle = getComputedStyle(boardElement)
+    const boardBorderLeft = parseFloat(boardStyle.borderLeftWidth) || 0
+    const boardBorderTop = parseFloat(boardStyle.borderTopWidth) || 0
 
-    // Calculate piece position relative to the board using the current drag position
-    const relX = dragPos.x - (boardRect.left - containerRect.left)
-    const relY = dragPos.y - (boardRect.top - containerRect.top)
+    // Board content origin (first cell top-left) in container coordinates,
+    // accounting for the board's border.
+    const boardOriginX = boardRect.left - containerRect.left + boardBorderLeft
+    const boardOriginY = boardRect.top - containerRect.top + boardBorderTop
+
+    // Dragged piece's top-left relative to the board's content area
+    const relX = dragPos.x - boardOriginX
+    const relY = dragPos.y - boardOriginY
 
     const updatedPieces = pieces.map((p) => {
       if (p.id !== draggingPiece) return p
 
-      const { snappedX, snappedY } = snapToGrid(relX, relY)
+      const { snappedX, snappedY } = snapToGrid(relX, relY, p.size)
       const start = getStartingPosition(p.id % PIECES_PER_PLAYER)
       const originalBoardPosition = dragStartData?.boardPosition
       const originalPlaced = dragStartData?.placed
@@ -414,7 +432,7 @@ function RussianJiangi() {
         }
       }
     } else {
-      const { snappedX, snappedY } = snapToGrid(relX, relY)
+      const { snappedX, snappedY } = snapToGrid(relX, relY, draggedPiece?.size)
       if (isWithinBoard(snappedX, snappedY)) {
         try {
           const response = await fetch('/api/game/move', {
@@ -532,15 +550,6 @@ function RussianJiangi() {
   }
 
   const placedCount = pieces.filter((p) => p.placed).length
-  const remainingByPlayer = {
-    player1: pieces.filter((p) => p.player === 'player1' && !p.placed).length,
-    player2: pieces.filter((p) => p.player === 'player2' && !p.placed).length,
-  }
-  const placedBySize = {
-    small: pieces.filter((p) => p.placed && p.size === 'small').length,
-    medium: pieces.filter((p) => p.placed && p.size === 'medium').length,
-    large: pieces.filter((p) => p.placed && p.size === 'large').length,
-  }
   const currentPlayerLabel = currentPlayer === 'player1' ? 'RussianDoll' : 'RussianDoll2'
 
   return (
@@ -665,8 +674,8 @@ function RussianJiangi() {
           id="puzzle-board"
           className="puzzle-board"
           style={{
-            width: GRID_SIZE * CELL_SIZE,
-            height: GRID_SIZE * CELL_SIZE,
+            width: GRID_SIZE * CELL_SIZE + BOARD_BORDER * 2,
+            height: GRID_SIZE * CELL_SIZE + BOARD_BORDER * 2,
           }}
         >
           {Array.from({ length: GRID_SIZE * GRID_SIZE }).map((_, i) => (
