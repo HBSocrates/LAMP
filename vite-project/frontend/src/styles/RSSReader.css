@@ -189,12 +189,32 @@
 @media (max-width: 600px) {
     .rss-items-grid {
         grid-template-columns: 1fr;
+        padding: 0.5rem;
+        gap: 1rem;
+    }
+
+    .rss-reader {
+        padding: 1.5rem 0;
     }
 
     .feed-title {
         font-size: 2rem;
     }
 
+    .rss-item-card {
+        padding: 1.25rem;
+    }
+
+    .rss-empty-state,
+    .rss-error-card {
+        margin: 1.5rem auto;
+        padding: 2rem 1.25rem;
+    }
+
+    .pagination-controls {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
 }
 
 .podcast-player {

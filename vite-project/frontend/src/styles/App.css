@@ -7,6 +7,7 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 2rem;
+  box-sizing: border-box;
 }
 
 /* Hero Section */
@@ -67,7 +68,7 @@
 
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
   gap: 2rem;
   margin-bottom: 4rem;
 }
@@ -128,6 +129,135 @@
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.5);
   font-size: 0.9rem;
+}
+
+/* Auth pages (login / signup) */
+.auth-page {
+  min-height: calc(100vh - 85px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.auth-card h1 {
+  font-size: 1.8rem;
+  margin: 0 0 1.5rem 0;
+  color: #fff;
+  overflow-wrap: break-word;
+}
+
+.auth-card p {
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+  overflow-wrap: break-word;
+}
+
+.auth-card input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.3);
+  color: white;
+  transition: border-color 0.2s;
+}
+
+.auth-card input:focus {
+  outline: none;
+  border-color: #646cff;
+}
+
+.auth-card button {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  border-radius: 12px;
+  border: none;
+  background: #646cff;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.auth-card button:hover {
+  background: #535bf2;
+}
+
+@media (prefers-color-scheme: light) {
+  .auth-card {
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  .auth-card h1 {
+    color: #213547;
+  }
+  .auth-card p {
+    color: rgba(33, 53, 71, 0.7);
+  }
+  .auth-card input {
+    background: rgba(0, 0, 0, 0.05);
+    color: #213547;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1.25rem;
+  }
+
+  .hero {
+    padding: 4rem 1.25rem;
+  }
+
+  .hero h1 {
+    font-size: 2.5rem;
+  }
+
+  .tagline {
+    font-size: 1.15rem;
+  }
+
+  .section-title {
+    font-size: 1.9rem;
+  }
+
+  .projects-section {
+    padding: 3rem 0;
+  }
+
+  .project-card {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .hero h1 {
+    font-size: 2.1rem;
+  }
+
+  .cta-button {
+    padding: 0.85rem 1.5rem;
+    font-size: 1rem;
+  }
 }
 
 @media (prefers-color-scheme: light) {

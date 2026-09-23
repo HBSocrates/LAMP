@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import '../styles/App.css';
 
 //  Sign Up Page.  In theory, should use the backend to keep track of if the user is logged in or not, but for now we'll be using localstorage for simplicity
 const SignUp = () => {
@@ -8,9 +9,8 @@ const SignUp = () => {
     const [processing, setProcessing] = useState(false);
     const [signUpText, setSignUpText] = useState(localStorage.getItem('loggedIn') === 'true' ? 'Currently Logged In' : 'Sign Up');
 
-    const signUp = async (e) => {
+    const signUp = async () => {
         console.log('Submitting sign up form with username:', username, 'and password:', password);
-        e.preventDefault();
         setProcessing(true);
         setError(null);
 
@@ -48,7 +48,6 @@ const SignUp = () => {
                 setSignUpText('Sign Up Failed: User Already Exists');
                 setError(null);
             } else {
-            //Handle failed sign up
                 setSignUpText('Sign Up Failed');
                 setError(null);
             }
@@ -57,24 +56,26 @@ const SignUp = () => {
 
     // Shows different page content depending on if the user is logged in or not.  If logged in, shows a welcome message and a log out button.  If not logged in, shows the sign up form
     return (
-        <div>
-            <h1>{error ? error : signUpText}</h1>
-            {signUpText === 'Currently Logged In' ? (
-                <>
-                    <p>You are already logged in as {localStorage.getItem('username')}. Please log out before trying to sign up for a new account.</p>
-                    <button type='submit' onClick={() => {
-                        localStorage.removeItem('loggedIn');
-                        localStorage.removeItem('username');
-                        setSignUpText('Sign Up');
-                    }}>Log Out</button>
-                </>
-            ) : (
-                <>
-                    <input name="username" required placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} /> <br></br>
-                    <input name="password" type="password" required placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} /> <br></br>
-                    <button type='submit' onClick = {signUp}>{processing ? 'Processing...' : 'Sign Up'}</button>
-                </>
-            )}
+        <div className="auth-page">
+            <div className="auth-card">
+                <h1>{error ? error : signUpText}</h1>
+                {signUpText === 'Currently Logged In' ? (
+                    <>
+                        <p>You are already logged in as {localStorage.getItem('username')}. Please log out before trying to sign up for a new account.</p>
+                        <button type='submit' onClick={() => {
+                            localStorage.removeItem('loggedIn');
+                            localStorage.removeItem('username');
+                            setSignUpText('Sign Up');
+                        }}>Log Out</button>
+                    </>
+                ) : (
+                    <>
+                        <input name="username" required placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
+                        <input name="password" type="password" required placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                        <button type='submit' onClick={signUp}>{processing ? 'Processing...' : 'Sign Up'}</button>
+                    </>
+                )}
+            </div>
         </div>
     );
 };

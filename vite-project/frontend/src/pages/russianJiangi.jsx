@@ -5,11 +5,20 @@ import RussianDoll from '../assets/matryoshka-doll.svg'
 import RussianDoll2 from '../assets/matryoshka-doll2.svg'
 
 const GRID_SIZE = 3
-const CELL_SIZE = 100
 const BOARD_BORDER = 4
 const PIECES_PER_PLAYER = 6
 const TOTAL_PIECES = PIECES_PER_PLAYER * 2
 const START_PLAYER = 'player1'
+
+const getCellSize = () => {
+  if (typeof window === 'undefined') return 100
+  const vw = window.innerWidth
+  if (vw < 360) return 70
+  if (vw < 480) return 90
+  return 100
+}
+
+const CELL_SIZE = getCellSize()
 const WIN_LINES = [
   [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }],
   [{ x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }],
@@ -28,8 +37,8 @@ const getSizeForPiece = (index) => {
 }
 
 const getStartingPosition = (index) => ({
-  x: (index % 2) * 120 + 10,
-  y: Math.floor(index / 2) * 120 + 10,
+  x: (index % 2) * (CELL_SIZE * 1.2) + 10,
+  y: Math.floor(index / 2) * (CELL_SIZE * 1.2) + 10,
 })
 
 const getSizeValue = (size) => {
@@ -38,8 +47,22 @@ const getSizeValue = (size) => {
 }
 
 const getSizeDimensions = (size) => {
-  const dims = { small: 60, medium: 80, large: 100 }
+  const dims = {
+    small: Math.round(CELL_SIZE * 0.6),
+    medium: Math.round(CELL_SIZE * 0.8),
+    large: CELL_SIZE,
+  }
   return dims[size]
+}
+
+const extractPoint = (e) => {
+  if (e.touches && e.touches.length > 0) {
+    return { x: e.touches[0].clientX, y: e.touches[0].clientY }
+  }
+  if (e.changedTouches && e.changedTouches.length > 0) {
+    return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY }
+  }
+  return { x: e.clientX, y: e.clientY }
 }
 
 const getSnapCell = (x, y, pieceSize) => {
@@ -128,11 +151,18 @@ function RussianJiangi() {
     const containerElement = document.getElementById('jiangi-game-root')
     if (!containerElement) return
 
+    const point = extractPoint(e)
     const containerRect = containerElement.getBoundingClientRect()
-    const x = e.clientX - containerRect.left - offset.x
-    const y = e.clientY - containerRect.top - offset.y
+    const x = point.x - containerRect.left - offset.x
+    const y = point.y - containerRect.top - offset.y
 
     setDragPos({ x, y })
+  }
+
+  const handleTouchMove = (e) => {
+    if (draggingPiece === null) return
+    e.preventDefault()
+    handleMouseMove(e)
   }
 
   const syncGameState = useCallback(async () => {
@@ -317,6 +347,7 @@ function RussianJiangi() {
     if (gameMode === 'ai' && piece.player === 'player2') return
     if (gameMode === 'online' && playerRole !== currentPlayer) return
 
+    const point = extractPoint(e)
     const rect = e.currentTarget.getBoundingClientRect()
     setDraggingPiece(pieceId)
     setDragStartData({
@@ -326,8 +357,8 @@ function RussianJiangi() {
       placed: piece.placed,
     })
     const grabbedOffset = {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x: point.x - rect.left,
+      y: point.y - rect.top,
     }
     setOffset(grabbedOffset)
 
@@ -335,10 +366,16 @@ function RussianJiangi() {
     if (containerElement) {
       const containerRect = containerElement.getBoundingClientRect()
       setDragPos({
-        x: e.clientX - containerRect.left - grabbedOffset.x,
-        y: e.clientY - containerRect.top - grabbedOffset.y,
+        x: point.x - containerRect.left - grabbedOffset.x,
+        y: point.y - containerRect.top - grabbedOffset.y,
       })
     }
+  }
+
+  const handleTouchStart = (e, pieceId) => {
+    if (draggingPiece !== null) return
+    e.preventDefault()
+    handleMouseDown(e, pieceId)
   }
 
   const handleMouseUp = async () => {
@@ -555,7 +592,7 @@ function RussianJiangi() {
   const currentPlayerLabel = currentPlayer === 'player1' ? 'RussianDoll' : 'RussianDoll2'
 
   return (
-    <div id="jiangi-game-root" className="russian-jiangi-container" onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
+    <div id="jiangi-game-root" className="russian-jiangi-container" onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp} onTouchMove={handleTouchMove} onTouchEnd={handleMouseUp} onTouchCancel={handleMouseUp}>
       <h1>Russian Jiangi</h1>
       <div className="game-header">
         <div className="mode-select">
@@ -639,6 +676,8 @@ function RussianJiangi() {
                 pointerEvents: 'none',
                 cursor: 'grabbing',
                 opacity: 1,
+                width: getSizeDimensions(p.size),
+                height: getSizeDimensions(p.size),
               }}
             >
               <img src={getAsset(p.player)} alt="Dragging piece" />
@@ -657,12 +696,15 @@ function RussianJiangi() {
                   key={`piece-${piece.id}`}
                   className={`puzzle-piece draggable ${piece.size} ${piece.player}`}
                   onMouseDown={(e) => handleMouseDown(e, piece.id)}
+                  onTouchStart={(e) => handleTouchStart(e, piece.id)}
                   data-size={piece.size}
                   style={{
                     left: piece.x,
                     top: piece.y,
                     cursor: piece.player === currentPlayer ? (draggingPiece === piece.id ? 'grabbing' : 'grab') : 'not-allowed',
                     opacity: piece.player === currentPlayer ? 1 : 0.45,
+                    width: getSizeDimensions(piece.size),
+                    height: getSizeDimensions(piece.size),
                   }}
                 >
                   <img src={getAsset(piece.player)} alt={`${piece.player} piece`} />
@@ -678,6 +720,7 @@ function RussianJiangi() {
           style={{
             width: GRID_SIZE * CELL_SIZE + BOARD_BORDER * 2,
             height: GRID_SIZE * CELL_SIZE + BOARD_BORDER * 2,
+            '--cell': `${CELL_SIZE}px`,
           }}
         >
           {Array.from({ length: GRID_SIZE * GRID_SIZE }).map((_, i) => (
@@ -702,9 +745,12 @@ function RussianJiangi() {
                     zIndex: getSizeValue(piece.size),
                     cursor: canDragPlaced ? 'grab' : 'default',
                     opacity: canDragPlaced ? 1 : 0.9,
+                    width: getSizeDimensions(piece.size),
+                    height: getSizeDimensions(piece.size),
                   }}
                   draggable={false}
                   onMouseDown={canDragPlaced ? (e) => handleMouseDown(e, piece.id) : undefined}
+                  onTouchStart={canDragPlaced ? (e) => handleTouchStart(e, piece.id) : undefined}
                 >
                   <img src={getAsset(piece.player)} alt={`${piece.player} piece`} />
                 </div>
@@ -723,12 +769,15 @@ function RussianJiangi() {
                   key={`piece-${piece.id}`}
                   className={`puzzle-piece draggable ${piece.size} ${piece.player}`}
                   onMouseDown={(e) => handleMouseDown(e, piece.id)}
+                  onTouchStart={(e) => handleTouchStart(e, piece.id)}
                   data-size={piece.size}
                   style={{
                     left: piece.x,
                     top: piece.y,
                     cursor: piece.player === currentPlayer ? (draggingPiece === piece.id ? 'grabbing' : 'grab') : 'not-allowed',
                     opacity: piece.player === currentPlayer ? 1 : 0.45,
+                    width: getSizeDimensions(piece.size),
+                    height: getSizeDimensions(piece.size),
                   }}
                 >
                   <img src={getAsset(piece.player)} alt={`${piece.player} piece`} />

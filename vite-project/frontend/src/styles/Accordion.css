@@ -3,11 +3,13 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 50px 30px;
+  padding: 50px 20px;
   border-radius: 15px;
   border: 1px solid #bdbdbd;
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   width: auto;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 h1.title {
@@ -15,8 +17,10 @@ h1.title {
   justify-content: center;
   align-items: center;
   width: 600px;
+  max-width: 100%;
   font-size: 40px;
   color: white;
+  text-align: center;
 }
 
 .accordion-items {
@@ -24,6 +28,9 @@ h1.title {
   flex-direction: column;
   align-items: flex-start;
   white-space: pre-line;
+  width: 100%;
+  max-width: 600px;
+  box-sizing: border-box;
 }
 
 .accordion-item {
@@ -31,11 +38,13 @@ h1.title {
   flex-direction: column;
   align-items: flex-start;
   width: 600px;
+  max-width: 100%;
   padding: 20px;
-  border-radius: 15px;
   padding-left: 72px;
+  border-radius: 15px;
   cursor: pointer;
   transition: 0.25s background-color;
+  box-sizing: border-box;
 }
 
 h1.accordion-tile {
@@ -90,6 +99,20 @@ p.accordion-content.active {
 
 .stroke-one.active {
   transform: translateX(calc(12px / 2 - 1.5px)) rotate(90deg);
+}
+
+@media (max-width: 600px) {
+  .accordion-menu {
+    padding: 30px 12px;
+  }
+
+  h1.title {
+    font-size: 28px;
+  }
+
+  .accordion-item {
+    padding-left: 52px;
+  }
 }
 
 .stroke-two {

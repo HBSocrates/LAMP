@@ -277,14 +277,52 @@
 }
 
 @media (max-width: 600px) {
+    .math-game-wrapper {
+        padding: 1.5rem 1rem;
+    }
+
     .game-card {
-        padding: 2rem;
+        padding: 2rem 1.25rem;
     }
+
+    .game-title {
+        font-size: 2.25rem;
+    }
+
+    .game-subtitle {
+        font-size: 1rem;
+    }
+
     .problem-display {
-        font-size: 2.5rem;
+        font-size: 2.25rem;
     }
+
+    .answer-row {
+        gap: 0.5rem;
+    }
+
+    .answer-input {
+        width: 110px;
+        font-size: 1.3rem;
+        min-width: 0;
+    }
+
+    .submit-btn {
+        padding: 0.75rem 1rem;
+    }
+
+    .stats-bar {
+        gap: 1.5rem;
+        padding: 0.6rem 1.5rem;
+    }
+
     #settings-container {
         bottom: 1rem;
         right: 1rem;
+        left: 1rem;
+    }
+
+    .settings-toggle {
+        width: 100%;
     }
 }
