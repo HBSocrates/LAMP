@@ -361,6 +361,6 @@ def make_move():
         game.current_player = 'player2' if game.current_player == 'player1' else 'player1'
 
     db.session.commit()
-    return jsonify({'success': True, 'new_state': game.state_pieces, 'current_player': game.current_player, 'winner': game.winner, 'status': game.status})
+    return jsonify({'success': True, 'state_pieces': game.state_pieces, 'current_player': game.current_player, 'winner': game.winner, 'status': game.status})
 
 

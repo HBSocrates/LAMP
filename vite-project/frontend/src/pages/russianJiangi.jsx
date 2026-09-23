@@ -55,6 +55,21 @@ const getSizeDimensions = (size) => {
   return dims[size]
 }
 
+const normalizeServerPieces = (serverPieces) =>
+  (serverPieces || []).map((p) => {
+    const bp = p.boardPosition
+    if (bp) {
+      const dim = getSizeDimensions(p.size)
+      return {
+        ...p,
+        x: bp.x * CELL_SIZE + (CELL_SIZE - dim) / 2,
+        y: bp.y * CELL_SIZE + (CELL_SIZE - dim) / 2,
+      }
+    }
+    const start = getStartingPosition(p.id % PIECES_PER_PLAYER)
+    return { ...p, x: start.x, y: start.y }
+  })
+
 const extractPoint = (e) => {
   if (e.touches && e.touches.length > 0) {
     return { x: e.touches[0].clientX, y: e.touches[0].clientY }
@@ -173,7 +188,7 @@ function RussianJiangi() {
       const data = await response.json()
 
       // Sync pieces
-      setPieces(data.state_pieces)
+      setPieces(normalizeServerPieces(data.state_pieces))
 
       // Sync current player
       setCurrentPlayer(data.current_player)
@@ -492,7 +507,7 @@ function RussianJiangi() {
             setPieces(updatedPieces)
           } else {
             const data = await response.json()
-            setPieces(data.state_pieces)
+            setPieces(normalizeServerPieces(data.state_pieces))
             setCurrentPlayer(data.current_player)
             if (data.winner) setWinner(data.winner)
           }
@@ -589,7 +604,7 @@ function RussianJiangi() {
   }
 
   const placedCount = pieces.filter((p) => p.placed).length
-  const currentPlayerLabel = currentPlayer === 'player1' ? 'RussianDoll' : 'RussianDoll2'
+  const currentPlayerLabel = currentPlayer === 'player1' ? 'Player 1' : 'Player 2'
 
   return (
     <div id="jiangi-game-root" className="russian-jiangi-container" onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp} onTouchMove={handleTouchMove} onTouchEnd={handleMouseUp} onTouchCancel={handleMouseUp}>
@@ -614,15 +629,17 @@ function RussianJiangi() {
           >
             Two Player
           </button>
-          <button
-            className={gameMode === 'online' ? 'active' : ''}
-            onClick={() => {
-              setGameMode('online')
-              resetPuzzle()
-            }}
-          >
-            Online
-          </button>
+          {username && (
+            <button
+              className={gameMode === 'online' ? 'active' : ''}
+              onClick={() => {
+                setGameMode('online')
+                resetPuzzle()
+              }}
+            >
+              Online
+            </button>
+          )}
         </div>
         <p className="puzzle-status">
           Turn: <strong>{currentPlayerLabel}</strong>
