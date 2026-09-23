@@ -151,6 +151,7 @@ function RussianJiangi() {
   const [dragStartData, setDragStartData] = useState(null)
   const [offset, setOffset] = useState({ x: 0, y: 0 })
   const [winner, setWinner] = useState(null)
+  const [winnerPlayer, setWinnerPlayer] = useState(null)
   const [gameMode, setGameMode] = useState('ai')
   const [onlineStatus, setOnlineStatus] = useState('lobby')
   const [gameId, setGameId] = useState(null)
@@ -196,6 +197,9 @@ function RussianJiangi() {
       // Sync winner
       if (data.winner) {
         setWinner(data.winner)
+      }
+      if (data.winner_player) {
+        setWinnerPlayer(data.winner_player)
       }
 
       // Update online status if player 2 joined
@@ -336,6 +340,7 @@ function RussianJiangi() {
     setPieces(updatedPieces)
     if (newWinner) {
       setWinner(newWinner)
+      setWinnerPlayer(newWinner)
     } else {
       setCurrentPlayer('player1')
     }
@@ -356,11 +361,18 @@ function RussianJiangi() {
     return () => clearTimeout(timer)
   }, [currentPlayer, winner, pieces, gameMode, getAiMove, executeAiMove])
 
+  const canClickPiece = (piece) => {
+    if (!piece || winner) return false
+    if (gameMode === 'ai' && piece.player === 'player2') return false
+    if (gameMode === 'online') {
+      return playerRole === currentPlayer && piece.player === playerRole
+    }
+    return piece.player === currentPlayer
+  }
+
   const handleMouseDown = (e, pieceId) => {
     const piece = pieces.find((p) => p.id === pieceId)
-    if (!piece || winner || piece.player !== currentPlayer) return
-    if (gameMode === 'ai' && piece.player === 'player2') return
-    if (gameMode === 'online' && playerRole !== currentPlayer) return
+    if (!canClickPiece(piece)) return
 
     const point = extractPoint(e)
     const rect = e.currentTarget.getBoundingClientRect()
@@ -475,6 +487,7 @@ function RussianJiangi() {
       const newWinner = checkWinner(updatedPieces)
       if (newWinner) {
         setWinner(newWinner)
+        setWinnerPlayer(newWinner)
       } else {
         const placedPiece = updatedPieces.find((p) => p.id === draggingPiece)
         const moveSucceeded = placedPiece?.placed &&
@@ -510,6 +523,7 @@ function RussianJiangi() {
             setPieces(normalizeServerPieces(data.state_pieces))
             setCurrentPlayer(data.current_player)
             if (data.winner) setWinner(data.winner)
+            if (data.winner_player) setWinnerPlayer(data.winner_player)
           }
         } catch (err) {
           console.error('Move failed:', err)
@@ -601,10 +615,13 @@ function RussianJiangi() {
     )
     setCurrentPlayer(START_PLAYER)
     setWinner(null)
+    setWinnerPlayer(null)
   }
 
   const placedCount = pieces.filter((p) => p.placed).length
   const currentPlayerLabel = currentPlayer === 'player1' ? 'Player 1' : 'Player 2'
+  const winnerLabel =
+    winner === 'player1' || winner === 'player2' ? winner : winnerPlayer
 
   return (
     <div id="jiangi-game-root" className="russian-jiangi-container" onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp} onTouchMove={handleTouchMove} onTouchEnd={handleMouseUp} onTouchCancel={handleMouseUp}>
@@ -650,6 +667,9 @@ function RussianJiangi() {
         </div>
         <p className="puzzle-status">
           Turn: <strong>{currentPlayerLabel}</strong>
+          {gameMode === 'online' && playerRole && (
+            playerRole === currentPlayer ? ' — Your turn' : ' — Waiting for opponent'
+          )}
         </p>
       </div>
 
@@ -725,8 +745,8 @@ function RussianJiangi() {
                   style={{
                     left: piece.x,
                     top: piece.y,
-                    cursor: piece.player === currentPlayer ? (draggingPiece === piece.id ? 'grabbing' : 'grab') : 'not-allowed',
-                    opacity: piece.player === currentPlayer ? 1 : 0.45,
+                    cursor: canClickPiece(piece) ? (draggingPiece === piece.id ? 'grabbing' : 'grab') : 'not-allowed',
+                    opacity: canClickPiece(piece) ? 1 : 0.4,
                     width: getSizeDimensions(piece.size),
                     height: getSizeDimensions(piece.size),
                   }}
@@ -756,9 +776,7 @@ function RussianJiangi() {
             .filter((p) => p.placed)
             .sort((a, b) => getSizeValue(a.size) - getSizeValue(b.size))
             .map((piece) => {
-              const canDragPlaced =
-                piece.player === currentPlayer &&
-                !(gameMode === 'ai' && piece.player === 'player2')
+              const canDragPlaced = canClickPiece(piece)
               return (
                 <div
                   key={`piece-${piece.id}`}
@@ -798,8 +816,8 @@ function RussianJiangi() {
                   style={{
                     left: piece.x,
                     top: piece.y,
-                    cursor: piece.player === currentPlayer ? (draggingPiece === piece.id ? 'grabbing' : 'grab') : 'not-allowed',
-                    opacity: piece.player === currentPlayer ? 1 : 0.45,
+                    cursor: canClickPiece(piece) ? (draggingPiece === piece.id ? 'grabbing' : 'grab') : 'not-allowed',
+                    opacity: canClickPiece(piece) ? 1 : 0.4,
                     width: getSizeDimensions(piece.size),
                     height: getSizeDimensions(piece.size),
                   }}
@@ -815,9 +833,9 @@ function RussianJiangi() {
         Reset Game
       </button>
 
-      {winner && (
+      {winnerLabel && (
         <div className="completion-message">
-          🏆 {winner === 'player1' ? 'Player 1' : 'Player 2'} wins!
+          🏆 {winnerLabel === 'player1' ? 'Player 1' : 'Player 2'} wins!
         </div>
       )}
 

@@ -308,10 +308,14 @@ def get_game_state(game_id):
     game = db.session.get(Game, game_id)
     if not game:
         return jsonify({'message': 'Game not found'}), 404
+    winner_player = None
+    if game.winner:
+        winner_player = 'player1' if game.winner == game.player1_username else 'player2'
     return jsonify({
         'state_pieces': game.state_pieces,
         'current_player': game.current_player,
         'winner': game.winner,
+        'winner_player': winner_player,
         'status': game.status
     })
 
@@ -361,6 +365,6 @@ def make_move():
         game.current_player = 'player2' if game.current_player == 'player1' else 'player1'
 
     db.session.commit()
-    return jsonify({'success': True, 'state_pieces': game.state_pieces, 'current_player': game.current_player, 'winner': game.winner, 'status': game.status})
+    return jsonify({'success': True, 'state_pieces': game.state_pieces, 'current_player': game.current_player, 'winner': game.winner, 'winner_player': winner, 'status': game.status})
 
 
