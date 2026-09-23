@@ -3,30 +3,35 @@ import { NavLink as Link } from "react-router-dom";
 import styled from "styled-components";
 
 export const Nav = styled.nav`
-    background: #333333;
+    background: #1e293b;
     height: 85px;
     display: flex;
     justify-content: space-between;
     padding: 0.2rem calc((100vw - 1000px) / 2);
     z-index: 12;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 `;
 
 export const NavLink = styled(Link)`
-    color: #808080;
+    color: #94a3b8;
     display: flex;
     align-items: center;
     text-decoration: none;
     padding: 0 1rem;
     height: 100%;
     cursor: pointer;
+    transition: color 0.2s;
+    &:hover {
+        color: #ffffff;
+    }
     &.active {
-        color: white;
+        color: #ffffff;
     }
 `;
 
 export const Bars = styled(FaBars)`
     display: none;
-    color: #808080;
+    color: #94a3b8;
     z-index: 13;
     @media screen and (max-width: 768px) {
         display: block;
@@ -59,9 +64,9 @@ export const NavBtn = styled.nav`
 
 export const NavBtnLink = styled(Link)`
     border-radius: 4px;
-    background: #808080;
+    background: #6366f1;
     padding: 10px 22px;
-    color: #000000;
+    color: #ffffff;
     outline: none;
     border: none;
     cursor: pointer;
@@ -70,16 +75,16 @@ export const NavBtnLink = styled(Link)`
     margin-left: 24px;
     &:hover {
         transition: all 0.2s ease-in-out;
-        background: #ffffff93;
-        color: #808080;
+        background: #4f46e5;
+        color: #ffffff;
     }
 `;
 
 export const LogoutButton = styled.button`
     border-radius: 4px;
-    background: #808080;
+    background: #6366f1;
     padding: 10px 22px;
-    color: #000000;
+    color: #ffffff;
     outline: none;
     border: none;
     cursor: pointer;
@@ -89,8 +94,8 @@ export const LogoutButton = styled.button`
     font: inherit;
     &:hover {
         transition: all 0.2s ease-in-out;
-        background: #ffffff93;
-        color: #808080;
+        background: #4f46e5;
+        color: #ffffff;
     }
 `;
 
@@ -103,47 +108,49 @@ export const MobileMenu = styled.div`
         top: 85px;
         left: 0;
         right: 0;
-        background: #333333;
+        background: #1e293b;
         padding: 1rem 0 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         z-index: 12;
     }
 `;
 
 export const MobileNavLink = styled(Link)`
-    color: #808080;
+    color: #94a3b8;
     display: flex;
     align-items: center;
     text-decoration: none;
     padding: 1rem 1.5rem;
     width: auto;
     cursor: pointer;
+    transition: color 0.2s;
     &.active {
-        color: white;
+        color: #ffffff;
     }
     &:hover {
         background: rgba(255, 255, 255, 0.05);
-        color: white;
+        color: #ffffff;
     }
 `;
 
 export const MobileNavBtnLink = styled(MobileNavLink)`
-    color: #000000;
+    color: #ffffff;
     border-radius: 4px;
-    background: #808080;
+    background: #6366f1;
     padding: 12px 22px;
     margin: 0.75rem 1.5rem 0;
     align-self: flex-start;
     &:hover {
-        background: #ffffff93;
-        color: #808080;
+        background: #4f46e5;
+        color: #ffffff;
     }
 `;
 
 export const MobileLogoutButton = styled.button`
-    color: #000000;
+    color: #ffffff;
     border-radius: 4px;
-    background: #808080;
+    background: #6366f1;
     padding: 12px 22px;
     margin: 0.75rem 1.5rem 0;
     align-self: flex-start;
@@ -151,7 +158,7 @@ export const MobileLogoutButton = styled.button`
     cursor: pointer;
     font: inherit;
     &:hover {
-        background: #ffffff93;
-        color: #808080;
+        background: #4f46e5;
+        color: #ffffff;
     }
 `;

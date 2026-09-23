@@ -1,3 +1,13 @@
+:root {
+  --bg-color: #0f172a;
+  --card-bg: #1e293b;
+  --accent-primary: #6366f1;
+  --accent-secondary: #a855f7;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --glass-border: rgba(255, 255, 255, 0.1);
+}
+
 .russian-jiangi-container {
   position: relative;
   display: flex;
@@ -5,18 +15,39 @@
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
-  background-color: #242424;
+  background-color: var(--bg-color);
   min-height: 100vh;
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  color: rgba(255, 255, 255, 0.87);
+  color: var(--text-main);
 }
 
 .russian-jiangi-container h1 {
   font-size: 3rem;
   margin-bottom: 30px;
   text-align: center;
-  color: #ffffff;
-  font-weight: 700;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--text-main);
+}
+
+.game-description {
+  max-width: 620px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 0 24px 0;
+  padding: 14px 20px;
+  text-align: center;
+  background: var(--card-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.game-description p {
+  margin: 0;
 }
 
 .game-header {
@@ -26,11 +57,10 @@
   justify-content: center;
   align-items: center;
   margin-bottom: 40px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--card-bg);
   padding: 12px 24px;
   border-radius: 50px;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
 }
 
 .mode-select {
@@ -44,7 +74,7 @@
 .mode-select button {
   border: none;
   background: transparent;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-muted);
   padding: 6px 16px;
   border-radius: 20px;
   cursor: pointer;
@@ -54,18 +84,18 @@
 }
 
 .mode-select button.active {
-  background: #646cff;
+  background: var(--accent-primary);
   color: white;
 }
 
 .puzzle-status {
   font-size: 1.1rem;
   margin: 0;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-muted);
 }
 
 .puzzle-status strong {
-  color: #646cff;
+  color: var(--accent-primary);
   font-size: 1.2rem;
 }
 
@@ -79,17 +109,16 @@
 }
 
 .pieces-container {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--card-bg);
   border-radius: 20px;
   padding: 20px;
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   transition: transform 0.3s ease;
 }
 
 .player-1-pieces {
-  border-top: 4px solid #646cff;
+  border-top: 4px solid var(--accent-primary);
 }
 
 .player-2-pieces {
@@ -97,7 +126,7 @@
 }
 
 .pieces-container h3 {
-  color: #ffffff;
+  color: var(--text-main);
   font-size: 1.2rem;
   margin: 0 0 15px 0;
   text-align: center;
@@ -109,7 +138,7 @@
   width: 260px;
   height: 400px;
   background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
   border-radius: 12px;
   padding: 10px;
 }
@@ -121,8 +150,8 @@
   grid-template-columns: repeat(3, var(--cell, 100px));
   grid-template-rows: repeat(3, var(--cell, 100px));
   gap: 0;
-  background-color: #1a1a1a;
-  border: 4px solid #333;
+  background-color: var(--card-bg);
+  border: 4px solid #334155;
   padding: 0;
   border-radius: 16px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
@@ -132,14 +161,14 @@
 .grid-cell {
   width: var(--cell, 100px);
   height: var(--cell, 100px);
-  background-color: #242424;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background-color: var(--bg-color);
+  border: 1px solid var(--glass-border);
   box-sizing: border-box;
   transition: background-color 0.2s ease;
 }
 
 .grid-cell:hover {
-  background-color: #2d2d2d;
+  background-color: rgba(255, 255, 255, 0.06);
 }
 
 /* Puzzle Pieces */
@@ -159,7 +188,7 @@
 .puzzle-piece.medium { width: 80px; height: 80px; }
 .puzzle-piece.large { width: 100px; height: 100px; }
 
-.puzzle-piece.player1 { border: 3px solid #646cff; }
+.puzzle-piece.player1 { border: 3px solid var(--accent-primary); }
 .puzzle-piece.player2 { border: 3px solid #f59e0b; }
 
 .puzzle-piece.draggable {
@@ -192,19 +221,19 @@
   font-size: 1rem;
   font-weight: 600;
   color: white;
-  background-color: #646cff;
+  background-color: var(--accent-primary);
   border: none;
   border-radius: 50px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(100, 108, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
   margin-bottom: 30px;
 }
 
 .reset-button:hover {
-  background-color: #535bf2;
+  background-color: #4f46e5;
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(100, 108, 255, 0.5);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.5);
 }
 
 /* Completion Message */
@@ -215,15 +244,15 @@
   transform: translate(-50%, -50%);
   z-index: 2000;
   font-size: 2rem;
-  color: #ffffff;
+  color: var(--text-main);
   font-weight: 800;
   padding: 40px 80px;
   background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(10px);
-  border: 2px solid #646cff;
+  border: 2px solid var(--accent-primary);
   border-radius: 24px;
   text-align: center;
-  box-shadow: 0 0 40px rgba(100, 108, 255, 0.3);
+  box-shadow: 0 0 40px rgba(99, 102, 241, 0.3);
   animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 

@@ -1,12 +1,23 @@
+:root {
+  --bg-color: #0f172a;
+  --card-bg: #1e293b;
+  --accent-primary: #6366f1;
+  --accent-secondary: #a855f7;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --glass-border: rgba(255, 255, 255, 0.1);
+}
+
 .accordion-menu {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 50px 20px;
-  border-radius: 15px;
-  border: 1px solid #bdbdbd;
-  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  border-radius: 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   width: auto;
   max-width: 100%;
   box-sizing: border-box;
@@ -19,14 +30,18 @@ h1.title {
   width: 600px;
   max-width: 100%;
   font-size: 40px;
-  color: white;
+  color: var(--text-main);
   text-align: center;
+  margin: 0 0 1.5rem 0;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .accordion-items {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: stretch;
   white-space: pre-line;
   width: 100%;
   max-width: 600px;
@@ -47,9 +62,14 @@ h1.title {
   box-sizing: border-box;
 }
 
+.accordion-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
 h1.accordion-tile {
   font-size: 24px;
   font-weight: 500;
+  color: var(--text-main);
 }
 
 p.accordion-content {
@@ -57,6 +77,7 @@ p.accordion-content {
   overflow: hidden;
   font-size: 14px;
   font-weight: 300;
+  color: var(--text-muted);
   margin: 0;
   transition: 0.5s max-height, 0.5s margin;
 }
@@ -79,7 +100,8 @@ p.accordion-content.active {
 }
 
 .icon-container.active {
-  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  background: rgba(99, 102, 241, 0.15);
+  box-shadow: rgba(99, 102, 241, 0.3) 0px 2px 8px 0px;
 }
 
 .stroke-one,
@@ -93,12 +115,19 @@ p.accordion-content.active {
 .stroke-one {
   width: 3px;
   height: 12px;
-  background-color: white;
+  background-color: var(--text-main);
   transform: translateX(calc(12px / 2 - 1.5px)) rotate(0deg);
 }
 
 .stroke-one.active {
   transform: translateX(calc(12px / 2 - 1.5px)) rotate(90deg);
+}
+
+.stroke-two {
+  height: 3px;
+  width: 12px;
+  background-color: var(--text-main);
+  transform: translateY(calc(-12px / 2 - 1.5px));
 }
 
 @media (max-width: 600px) {
@@ -113,11 +142,4 @@ p.accordion-content.active {
   .accordion-item {
     padding-left: 52px;
   }
-}
-
-.stroke-two {
-  height: 3px;
-  width: 12px;
-  background-color: white;
-  transform: translateY(calc(-12px / 2 - 1.5px));
 }
