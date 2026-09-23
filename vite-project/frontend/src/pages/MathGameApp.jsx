@@ -9,8 +9,19 @@ function createProblem(minVal, maxVal) {
   const range = max - min + 1;
 
   const n1 = Math.floor(Math.random() * range) + min;
-  const n2 = Math.floor(Math.random() * range) + min;
   const op = operandsList[Math.floor(Math.random() * operandsList.length)];
+
+  let n2 = Math.floor(Math.random() * range) + min;
+  if (op.name === '/') {
+    // Prevent division by zero: regenerate n2 until it's non-zero.
+    // Guard against an infinite loop when the range only contains 0 (min === max === 0).
+    while (n2 === 0 && range > 1) {
+      n2 = Math.floor(Math.random() * range) + min;
+    }
+    if (n2 === 0) {
+      n2 = 1;
+    }
+  }
 
   let sol = 0;
   switch (op.name) {
@@ -18,9 +29,8 @@ function createProblem(minVal, maxVal) {
     case '-': sol = n1 - n2; break;
     case '*': sol = n1 * n2; break;
     case '/': {
-      // Ensure no division by zero and allow decimals
-      const divisor = n2 === 0 ? 1 : n2;
-      sol = n1 / divisor;
+      // Allow decimals from division
+      sol = n1 / n2;
       break;
     }
     default: sol = 0;
