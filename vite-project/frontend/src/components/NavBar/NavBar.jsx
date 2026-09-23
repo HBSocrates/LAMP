@@ -37,19 +37,19 @@ const Navbar = () => {
                     <NavLink to="/about" >
                         About Me
                     </NavLink>
-                    {!isLoggedIn() && (
-                        <NavLink to="/signUp">
-                            Sign Up
-                        </NavLink>
-                    )}
                 </NavMenu>
                 <NavBtn>
                     {isLoggedIn() ? (
                         <LogoutButton onClick={handleLogout}>Log Out</LogoutButton>
                     ) : (
-                        <NavBtnLink to="/login">
-                            Log In
-                        </NavBtnLink>
+                        <>
+                            <NavBtnLink to="/signUp">
+                                Sign Up
+                            </NavBtnLink>
+                            <NavBtnLink to="/login">
+                                Log In
+                            </NavBtnLink>
+                        </>
                     )}
                 </NavBtn>
             </Nav>
@@ -70,17 +70,17 @@ const Navbar = () => {
                     <MobileNavLink to="/about" onClick={closeMobile}>
                         About Me
                     </MobileNavLink>
-                    {!isLoggedIn() && (
-                        <MobileNavLink to="/signUp" onClick={closeMobile}>
-                            Sign Up
-                        </MobileNavLink>
-                    )}
                     {isLoggedIn() ? (
                         <MobileLogoutButton onClick={handleLogout}>Log Out</MobileLogoutButton>
                     ) : (
-                        <MobileNavBtnLink to="/login" onClick={closeMobile}>
-                            Log In
-                        </MobileNavBtnLink>
+                        <>
+                            <MobileNavBtnLink to="/signUp" onClick={closeMobile}>
+                                Sign Up
+                            </MobileNavBtnLink>
+                            <MobileNavBtnLink to="/login" onClick={closeMobile}>
+                                Log In
+                            </MobileNavBtnLink>
+                        </>
                     )}
                 </MobileMenu>
             )}

@@ -44,7 +44,10 @@ function MathGameApp() {
   const [answer, setAnswer] = useState("");
   const [response, setResponse] = useState("");
   const [score, setScore] = useState(0);
-  const [highScore, setHighScore] = useState(localStorage.getItem('highScore') || 0);
+  const [highScore, setHighScore] = useState(() => {
+    const stored = parseInt(localStorage.getItem('highScore'), 10);
+    return Number.isNaN(stored) ? 0 : stored;
+  });
   const [min, setMin] = useState(localStorage.getItem('min') || -12);
   const [max, setMax] = useState(localStorage.getItem('max') || 12);
   const [showSettings, setShowSettings] = useState(false);
@@ -65,7 +68,10 @@ function MathGameApp() {
     })
       .then((res) => res.json())
       .then((data) => {
-        if (!cancelled && data.message) setHighScore(data.message)
+        if (!cancelled) {
+          const parsed = parseInt(data.message, 10);
+          setHighScore(Number.isNaN(parsed) ? 0 : parsed);
+        }
       })
       .catch((error) => console.error('Error fetching score:', error))
     return () => {
