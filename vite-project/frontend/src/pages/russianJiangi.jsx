@@ -609,6 +609,7 @@ function RussianJiangi() {
   return (
     <div id="jiangi-game-root" className="russian-jiangi-container" onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp} onTouchMove={handleTouchMove} onTouchEnd={handleMouseUp} onTouchCancel={handleMouseUp}>
       <h1>Russian Jiangi</h1>
+      <h2>Tic-Tac-Toe, with a twist!  You can place your larger pieces over your opponent's smaller pieces, and even move pieces after they have been placed.  Log in to play online.</h2>
       <div className="game-header">
         <div className="mode-select">
           <button
