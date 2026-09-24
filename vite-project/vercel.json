@@ -10,6 +10,6 @@
   },
   "rewrites": [
     { "source": "/api/(.*)", "destination": { "service": "my_backend" } },
-    { "source": "/(.*)", "destination": { "service": "my_frontend" } }
+    { "source": "/(.*)", "destination": { "service": "my_frontend/index.html" } }
   ]
 }
