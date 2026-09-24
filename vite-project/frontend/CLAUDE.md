@@ -35,6 +35,7 @@ The project is a full-stack application with a decoupled frontend and backend.
 - **Environment**: Managed via `requirements.txt` and `Pipfile`.
 - **Deployment**: Includes `vercel.json` for Vercel deployment.
 - **Database**: Migrations are handled in the `migrations/` directory.
+- **Gotcha**: `Game.state_pieces` (SQLAlchemy `JSON` column) ignores in-place mutations; `make_move` deep-copies it before editing (`copy.deepcopy`), never `list(game.state_pieces)`.
 
 ## Project Structure
 - `/api`: Python Flask backend source code.

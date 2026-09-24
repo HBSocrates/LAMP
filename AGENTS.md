@@ -27,6 +27,7 @@ Both `frontend/.env` (DATABASE_URL, DATABASE_URL_DIRECT, VITE_POSTGRES_CLAIM_URL
 - Most `/api/*` endpoints read `request.form` (form-encoded body), not JSON. Game state GET returns JSON. Keep payload types matching the callers in `frontend/src/pages/`.
 - Schema changes: Flask-Migrate/Alembic in `api/migrations/` — run `flask db migrate` / `flask db upgrade` from `api/`.
 - Server logging is `print(..., file=sys.stderr)`; Flask debug mode is disabled.
+- `Game.state_pieces` is a SQLAlchemy `JSON` column and in-place dict mutation is **not tracked**. `make_move` must `copy.deepcopy(game.state_pieces)` before editing a piece — `list(game.state_pieces)` shares the dicts with the already-loaded value, so the reassigned list compares equal and the column is never saved (turns advance, pieces never persist).
 
 ## Frontend gotchas
 

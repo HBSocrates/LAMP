@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, JSON
 from flask_migrate import Migrate
 from flask_cors import CORS
-import os, hashlib, sys, datetime
+import os, hashlib, sys, datetime, copy
 from dotenv import load_dotenv
 # General skeleton/structure from Neon's Flask tutorial
 
@@ -338,7 +338,7 @@ def make_move():
     if username != expected_username:
         return jsonify({'message': 'Not your turn'}), 403
 
-    pieces = list(game.state_pieces)
+    pieces = copy.deepcopy(game.state_pieces)
     piece = next((p for p in pieces if p['id'] == piece_id), None)
     if not piece:
         return jsonify({'message': 'Piece not found'}), 400
