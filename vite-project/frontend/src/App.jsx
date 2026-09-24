@@ -12,7 +12,6 @@ import MathGameApp from "./pages/MathGameApp";
 import RSSFeed from "./pages/rssFeed";
 import SignUp from "./pages/signUp";
 import Login from "./pages/login";
-import ApiTest from "./pages/apiTest.jsx";
 import RussianJiangi from "./pages/russianJiangi.jsx";
 
 function App() {
