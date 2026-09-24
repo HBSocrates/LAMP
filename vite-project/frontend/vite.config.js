@@ -11,6 +11,7 @@ export default defineConfig({
 		react(),
 	],
 	server: {
+		historyApiFallback: true,
 		proxy: {
 		  '/api': 'http://localhost:5000',
 		},
