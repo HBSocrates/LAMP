@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import mathLogo from "../assets/math.svg";
 import reactLogo from "../assets/react.svg";
 import matryoshkaLogo from "../assets/matryoshka-doll.svg";
+import youtubeLogo from "../assets/youtube.svg";
 
 const Home = () => {
   const projects = [
@@ -24,6 +25,12 @@ const Home = () => {
       description: "A specialized tool designed for learning and exploring the nuances of the Russian language and culture.",
       link: "/RussianJiangi",
       icon: matryoshkaLogo,
+    },
+    {
+      title: "YouTube Tutorial Guide",
+      description: "Paste any YouTube tutorial link to pull its transcript and turn it into a clear, step-by-step guide.",
+      link: "/youtubeGuide",
+      icon: youtubeLogo,
     },
   ];
 

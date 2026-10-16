@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Nav, NavLink, Bars, NavMenu, NavBtn, NavBtnLink, LogoutButton, MobileMenu, MobileNavLink, MobileNavBtnLink, MobileLogoutButton } from "./NavBarElements";
 
@@ -34,6 +34,9 @@ const Navbar = () => {
                     <NavLink to="/RussianJiangi">
                         Russian Jiangi
                     </NavLink>
+                    <NavLink to="/youtubeGuide">
+                        YouTube Guide
+                    </NavLink>
                     <NavLink to="/about" >
                         About Me
                     </NavLink>
@@ -66,6 +69,9 @@ const Navbar = () => {
                     </MobileNavLink>
                     <MobileNavLink to="/RussianJiangi" onClick={closeMobile}>
                         Russian Jiangi
+                    </MobileNavLink>
+                    <MobileNavLink to="/youtubeGuide" onClick={closeMobile}>
+                        YouTube Guide
                     </MobileNavLink>
                     <MobileNavLink to="/about" onClick={closeMobile}>
                         About Me

@@ -1,9 +1,9 @@
-from flask import Flask, jsonify, request
+﻿from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, JSON
 from flask_migrate import Migrate
 from flask_cors import CORS
-import os, hashlib, sys, datetime, copy
+import os, hashlib, sys, datetime, copy, json, re, requests
 from dotenv import load_dotenv
 # General skeleton/structure from Neon's Flask tutorial
 
@@ -367,4 +367,162 @@ def make_move():
     db.session.commit()
     return jsonify({'success': True, 'state_pieces': game.state_pieces, 'current_player': game.current_player, 'winner': game.winner, 'winner_player': winner, 'status': game.status})
 
+
+# --- YouTube Transcript & Step-by-Step Guide ---
+
+YOUTUBE_HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    'Accept-Language': 'en-US,en;q=0.9',
+}
+
+
+def extract_video_id(url):
+    if not url:
+        return None
+    patterns = [
+        r'(?:v=)([A-Za-z0-9_-]{11})',
+        r'youtu\.be/([A-Za-z0-9_-]{11})',
+        r'youtube\.com/embed/([A-Za-z0-9_-]{11})',
+        r'youtube\.com/shorts/([A-Za-z0-9_-]{11})',
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, url)
+        if match:
+            return match.group(1)
+    if re.fullmatch(r'[A-Za-z0-9_-]{11}', url.strip()):
+        return url.strip()
+    return None
+
+
+def fetch_youtube_title(video_id):
+    try:
+        response = requests.get(
+            'https://www.youtube.com/oembed',
+            params={
+                'url': f'https://www.youtube.com/watch?v={video_id}',
+                'format': 'json',
+            },
+            headers=YOUTUBE_HEADERS,
+            timeout=20,
+        )
+        if response.ok:
+            return response.json().get('title') or ''
+    except (requests.RequestException, json.JSONDecodeError):
+        pass
+    return ''
+
+
+def fetch_youtube_transcript(video_id):
+    from youtube_transcript_api import YouTubeTranscriptApi
+    from youtube_transcript_api._errors import (
+        NoTranscriptFound,
+        TranscriptsDisabled,
+        VideoUnavailable,
+    )
+
+    api = YouTubeTranscriptApi()
+
+    try:
+        transcript_list = api.list(video_id)
+    except TranscriptsDisabled:
+        raise ValueError('Transcripts are disabled for this video.')
+    except VideoUnavailable:
+        raise ValueError('This video is unavailable.')
+
+    try:
+        transcript = transcript_list.find_transcript(['en'])
+    except NoTranscriptFound:
+        try:
+            transcript = next(iter(transcript_list))
+        except StopIteration:
+            raise ValueError('This video does not have a transcript available.')
+
+    try:
+        fetched = transcript.fetch()
+    except (TranscriptsDisabled, VideoUnavailable, NoTranscriptFound):
+        raise ValueError('This video does not have a transcript available.')
+
+    noise_pattern = re.compile(r'^[\[\(].*[\]\)]$')
+    segments = [
+        {'start': snippet.start, 'text': snippet.text.strip()}
+        for snippet in fetched
+        if snippet.text
+        and snippet.text.strip()
+        and not noise_pattern.match(snippet.text.strip())
+    ]
+    if not segments:
+        raise ValueError('The transcript for this video is empty.')
+
+    title = fetch_youtube_title(video_id)
+    return title, segments
+
+
+def format_timestamp(seconds):
+    total = int(seconds)
+    minutes, secs = divmod(total, 60)
+    hours, minutes = divmod(minutes, 60)
+    if hours:
+        return f'{hours}:{minutes:02d}:{secs:02d}'
+    return f'{minutes}:{secs:02d}'
+
+
+def build_step_guide(segments, max_words=80, gap_seconds=3.0):
+    steps = []
+    current_texts = []
+    current_word_count = 0
+    step_start = segments[0]['start'] if segments else 0.0
+    previous_start = segments[0]['start'] if segments else 0.0
+
+    for segment in segments:
+        gap = segment['start'] - previous_start
+        word_count = len(segment['text'].split())
+        if current_texts and (current_word_count + word_count > max_words or gap > gap_seconds):
+            steps.append({
+                'step': len(steps) + 1,
+                'timestamp': format_timestamp(step_start),
+                'text': ' '.join(current_texts).strip(),
+            })
+            current_texts = []
+            current_word_count = 0
+            step_start = segment['start']
+        current_texts.append(segment['text'])
+        current_word_count += word_count
+        previous_start = segment['start']
+
+    if current_texts:
+        steps.append({
+            'step': len(steps) + 1,
+            'timestamp': format_timestamp(step_start),
+            'text': ' '.join(current_texts).strip(),
+        })
+    return steps
+
+
+@app.route('/api/youtube/guide', methods=['POST'])
+def youtube_guide():
+    url = request.form.get('url') or request.form.get('youtube_url') or ''
+    video_id = extract_video_id(url)
+    if not video_id:
+        return jsonify({'message': 'Please enter a valid YouTube URL.'}), 400
+
+    try:
+        title, segments = fetch_youtube_transcript(video_id)
+    except ValueError as error:
+        print('YouTube guide error:', error, file=sys.stderr)
+        return jsonify({'message': str(error)}), 400
+    except requests.RequestException as error:
+        print('YouTube guide request error:', error, file=sys.stderr)
+        return jsonify({'message': 'Could not reach YouTube. Please try again.'}), 502
+
+    steps = build_step_guide(segments)
+    transcript = ' '.join(segment['text'] for segment in segments)
+
+    print('Generated guide for video:', video_id, '- steps:', len(steps), file=sys.stderr)
+    return jsonify({
+        'video_id': video_id,
+        'title': title,
+        'url': f'https://www.youtube.com/watch?v={video_id}',
+        'steps': steps,
+        'transcript': transcript,
+    })
 

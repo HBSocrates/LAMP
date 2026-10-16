@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import "./styles/App.css";
 import Navbar from "./components/NavBar/NavBar.jsx";
 import {
@@ -13,6 +13,7 @@ import RSSFeed from "./pages/rssFeed";
 import SignUp from "./pages/signUp";
 import Login from "./pages/login";
 import RussianJiangi from "./pages/russianJiangi.jsx";
+import YouTubeGuide from './pages/youtubeGuide.jsx';
 
 function App() {
 
@@ -24,6 +25,7 @@ function App() {
                 <Route path="/mathApp" element={<MathGameApp />} />
                 <Route path="/rssFeed" element={<RSSFeed />} />
                 <Route path="/RussianJiangi" element={<RussianJiangi />} />
+                <Route path='/youtubeGuide' element={<YouTubeGuide />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/signUp" element={<SignUp />} />
                 <Route path="/login" element={<Login />} />
@@ -33,3 +35,4 @@ function App() {
 }
 
 export default App
+
