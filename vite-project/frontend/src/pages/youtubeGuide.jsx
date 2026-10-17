@@ -2,6 +2,9 @@
 import '../styles/App.css';
 import '../styles/YouTubeGuide.css';
 
+const isVercelDeployment =
+    typeof window !== 'undefined' && window.location.hostname.endsWith('vercel.app');
+
 const YouTubeGuide = () => {
     const [url, setUrl] = useState('');
     const [guide, setGuide] = useState(null);
@@ -61,6 +64,13 @@ const YouTubeGuide = () => {
     return (
         <div className="yt-guide-wrapper">
             <div className="yt-guide-container">
+                {isVercelDeployment && (
+                    <div className="yt-guide-notice">
+                        <strong>Heads up:</strong> This feature needs to run against its own
+                        backend and will not work properly on the vercel.app deployment. To use
+                        it, run the site locally or self-host it.
+                    </div>
+                )}
                 <div className="yt-guide-card">
                     <h1>YouTube Tutorial Guide</h1>
                     <p>

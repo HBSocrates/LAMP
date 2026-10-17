@@ -88,6 +88,20 @@
     cursor: not-allowed;
 }
 
+.yt-guide-notice {
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid #f59e0b;
+    border-radius: 16px;
+    padding: 1rem 1.25rem;
+    color: #fcd34d;
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+.yt-guide-notice strong {
+    color: #fbbf24;
+}
+
 .yt-guide-error {
     background: rgba(239, 68, 68, 0.1);
     border: 1px solid #ef4444;
