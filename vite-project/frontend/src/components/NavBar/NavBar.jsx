@@ -35,7 +35,7 @@ const Navbar = () => {
                         Russian Jiangi
                     </NavLink>
                     <NavLink to="/youtubeGuide">
-                        YouTube Guide
+                        YouTube T2G
                     </NavLink>
                     <NavLink to="/about" >
                         About Me
@@ -71,7 +71,7 @@ const Navbar = () => {
                         Russian Jiangi
                     </MobileNavLink>
                     <MobileNavLink to="/youtubeGuide" onClick={closeMobile}>
-                        YouTube Guide
+                        YouTube T2G
                     </MobileNavLink>
                     <MobileNavLink to="/about" onClick={closeMobile}>
                         About Me

@@ -22,12 +22,12 @@ const Home = () => {
     },
     {
       title: "Russian Jiangi",
-      description: "A specialized tool designed for learning and exploring the nuances of the Russian language and culture.",
+      description: "A game inspired by Russian matryoshka dolls and Tic-Tac-Toe.",
       link: "/RussianJiangi",
       icon: matryoshkaLogo,
     },
     {
-      title: "YouTube Tutorial Guide",
+      title: "YouTube Tutorial to Step-by-Step Guide",
       description: "Paste any YouTube tutorial link to pull its transcript and turn it into a clear, step-by-step guide.",
       link: "/youtubeGuide",
       icon: youtubeLogo,

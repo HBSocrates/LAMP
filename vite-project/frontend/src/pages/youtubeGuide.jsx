@@ -72,7 +72,7 @@ const YouTubeGuide = () => {
                     </div>
                 )}
                 <div className="yt-guide-card">
-                    <h1>YouTube Tutorial Guide</h1>
+                    <h1>YouTube Tutorial to Step-by-Step Guide</h1>
                     <p>
                         Paste a YouTube tutorial URL to pull its transcript and turn it into a
                         step-by-step guide you can follow along with.

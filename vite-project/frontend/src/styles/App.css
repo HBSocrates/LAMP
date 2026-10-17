@@ -88,7 +88,7 @@
   transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  box-sizing: border-box;
 }
 
 .project-card:hover {
