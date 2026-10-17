@@ -1,11 +1,14 @@
 # LAMP — Full-Stack Portfolio Project
 
-A full-stack portfolio application built with a **React 19 + Vite** frontend and a **Flask** backend, backed by a Neon **PostgreSQL** database. The site hosts a portfolio of three interactive projects: a math game, an RSS/podcast feed reader, and a two-player online board game.
+A full-stack portfolio application built with a **React 19 + Vite** frontend and a **Flask** backend, backed by a Neon **PostgreSQL** database. The site hosts a portfolio of four interactive projects: a math game, an RSS/podcast feed reader, a YouTube transcript guide generator, and a two-player online board game.
+
+For in-depth guides, see [`docs/`](docs/): [Setup](docs/SETUP.md) · [API Reference](docs/API.md) · [Architecture](docs/ARCHITECTURE.md).
 
 ## Features
 
 - **Math Game App** (`/mathApp`) — Timed arithmetic practice with `+`, `-`, `*`, `/` problems. Number range is configurable and high scores are saved per user in the database.
 - **RSS Feed Reader** (`/rssFeed`) — A personalized feed/podcast aggregator. Users save RSS URLs, which are fetched and rendered through the rss2json API.
+- **YouTube Guide** (`/youtubeGuide`) — Paste a YouTube URL and get a step-by-step guide generated from the video's transcript (backend fetches the transcript, title, and timestamps).
 - **Russian Jiangi** (`/RussianJiangi`) — A real-time 2-player board game on a 3x3 grid where opponents stack matryoshka-doll pieces (small < medium < large) to claim three-in-a-row. Play online by creating/joining a game.
 - **Auth** (`/signUp`, `/login`) — Username/password accounts with password hashing via Postgres `pgcrypto` (`crypt` / `gen_salt`).
 
@@ -23,15 +26,20 @@ A full-stack portfolio application built with a **React 19 + Vite** frontend and
 ```
 vite-project/
 ├── api/                 Flask backend (single-file app + migrations)
-│   ├── app.py           Routes, SQLAlchemy models, game logic
+│   ├── app.py           Routes, SQLAlchemy models, game + YouTube logic
 │   ├── migrations/      Flask-Migrate / Alembic migrations
 │   └── requirements.txt
+├── docs/                In-depth guides (SETUP, API, ARCHITECTURE)
 ├── frontend/            React 19 + Vite SPA
 │   ├── src/
 │   │   ├── App.jsx      Router setup (routes for all pages)
 │   │   ├── main.jsx     Entry point
-│   │   ├── pages/       index, MathGameApp, rssFeed, russianJiangi, login, signUp, about
+│   │   ├── pages/       index, MathGameApp, rssFeed, russianJiangi,
+│   │   │                youtubeGuide, login, signUp, about, apiTest,
+│   │   │                gameLogic.js (unused helpers)
 │   │   ├── components/  NavBar, RSSReader, AccordionMenu, UtilityFunctions
+│   │   ├── sql/         SQL scratch files
+│   │   ├── assets/      Static assets
 │   │   └── styles/      Global and per-page CSS
 │   ├── index.html
 │   ├── package.json
@@ -49,6 +57,8 @@ vite-project/
 - A Neon PostgreSQL database (the app uses a Neon endpoint)
 
 ## Getting Started
+
+Full step-by-step instructions (including Neon database setup and migrations) are in [`docs/SETUP.md`](docs/SETUP.md). The short version:
 
 ### 1. Frontend
 
@@ -83,7 +93,7 @@ pip install -r requirements.txt
 flask run
 ```
 
-Or from the frontend directory on macOS/Linux: `npm run api`.
+With the virtual environment activated, you can also start the API from `frontend/` on any OS: `npm run api` (runs `cd ../api && python -m flask run --no-debugger`).
 
 Vite proxies `/api/*` requests to `http://localhost:5000` in development, so the frontend calls APIs with relative URLs.
 
@@ -126,6 +136,9 @@ All `POST` endpoints read **form-encoded** bodies (`request.form`); GET state en
 | POST   | `/api/game/join`      | `game_id`, `username`         | Join a waiting game as player 2          |
 | GET    | `/api/game/state/<int:game_id>` | —                      | Poll current game state                  |
 | POST   | `/api/game/move`      | `game_id`, `username`, `piece_id`, `x`, `y` | Make a move (validates turn + stacking) |
+| POST   | `/api/youtube/guide`  | `url`                       | Generate a step-by-step guide from a YouTube video's transcript |
+
+See [`docs/API.md`](docs/API.md) for full request/response details.
 
 ## Data Model
 

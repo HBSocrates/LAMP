@@ -17,7 +17,7 @@ From `frontend/`:
 
 Backend:
 - Needs `api/.env` (FLASK_APP, FLASK_ENV, DATABASE_URL). Start with `flask run` (port 5000).
-- `npm run api` uses `venv/bin/flask`, so it only works on macOS/Linux. On Windows: `api\venv\Scripts\activate` then `flask run`.
+- `npm run api` runs `cd ../api && python -m flask run --no-debugger`; it works on any OS **only while `api/venv` is activated** (it relies on the venv's `python`). Windows: `api\venv\Scripts\activate` then `flask run` from `api/`.
 
 Both `frontend/.env` (DATABASE_URL, DATABASE_URL_DIRECT, VITE_POSTGRES_CLAIM_URL) and `api/.env` are gitignored — never commit real values.
 

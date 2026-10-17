@@ -1,82 +1,81 @@
-# Vite React + Flask Project
+# LAMP Frontend
 
-A simple Vite + React frontend paired with a Flask backend.
+The React 19 + Vite single-page app for the LAMP portfolio project. The Flask backend lives in `../api/`; see the [project README](../README.md) and [docs/](../docs/) for the full picture.
 
 ## Overview
 
-- Frontend: React 19 + Vite
-- Backend: Flask API in `/api/`
-- Routing: `react-router-dom`
-- Data fetching: `axios`
+- Frontend: React 19 + Vite 7
+- Routing: `react-router-dom` (routes defined in `src/App.jsx`)
+- Styling: `styled-components` + CSS files in `src/styles/`
+- Data fetching: `fetch` for `/api/*` calls; `axios` only in the RSS feature (`src/components/RSSReader/`)
+- Dev server proxies `/api/*` to the Flask backend at `http://localhost:5000`
 
 ## Prerequisites
 
 - Node.js 18+ and npm
-- Python 3.11+ (or compatible Python 3.x)
-- Optional: `pipenv` if you choose to use the provided `Pipfile`
+- Python 3.11+ (for the backend in `../api/`)
 
 ## Setup
 
-1. Install frontend dependencies
+All commands below are run from **`vite-project/frontend/`** (this directory — there is no `package.json` at `vite-project/`).
+
+1. Install frontend dependencies:
 
 ```bash
-cd vite-project
 npm install
 ```
 
-2. Setup the Flask backend
+2. Set up the Flask backend (sibling directory):
 
 ```bash
-cd vite-project/api
+cd ../api
 python -m venv venv
 ```
 
-### On Windows
+**Windows**
 
 ```powershell
-cd vite-project\api
 venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### On macOS/Linux
+**macOS / Linux**
 
 ```bash
-cd vite-project/api
 source venv/bin/activate
 pip install -r requirements.txt
 ```
+
+3. Create the env files `../api/.env` and `./.env` — see [docs/SETUP.md](../docs/SETUP.md) for the required variables.
 
 ## Running the app
 
 ### Start the frontend
 
 ```bash
-cd vite-project
-npm run dev
+npm run dev        # http://localhost:5173
 ```
 
 ### Start the backend
 
-Go into the API folder, then:
-
-If you are on macOS or Linux, use:
+With the `api/venv` virtual environment activated (see setup above), either:
 
 ```bash
-cd vite-project
+# From this directory (frontend/) — works on any OS while the venv is active:
 npm run api
 ```
 
-On Windows, after activating the virtual environment, run:
+or manually:
 
-```
-flask run
+```bash
+cd ../api
+python -m flask run     # http://localhost:5000
 ```
 
 ## Notes
 
-- The app needs environment variables in a `.env` and `api/.env`
-- Use `npm run build` to create a production build of the frontend.
+- Both `.env` (here) and `../api/.env` are gitignored — never commit real values.
+- There is no automated test suite; `npm run build` and `npm run lint` are the checks.
 
 ## Useful commands
 
@@ -84,3 +83,4 @@ flask run
 - `npm run build` — build the frontend for production
 - `npm run preview` — preview the production build locally
 - `npm run lint` — run ESLint on frontend source files
+- `npm run api` — start the Flask backend (requires activated `api/venv`)
