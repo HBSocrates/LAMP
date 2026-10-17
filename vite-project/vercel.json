@@ -1,7 +1,10 @@
 {
   "services": {
     "my_frontend": {
-      "root": "frontend/"
+      "root": "frontend/",
+      "rewrites": [
+        { "source": "/(.*)", "destination": "/index.html" }
+      ]
     },
     "my_backend": {
       "root": "api/",

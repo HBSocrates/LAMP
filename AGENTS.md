@@ -34,3 +34,4 @@ Both `frontend/.env` (DATABASE_URL, DATABASE_URL_DIRECT, VITE_POSTGRES_CLAIM_URL
 - API calls are relative `/api/...` URLs via `fetch` (or `axios` in `RSSReader/RSSFetch.jsx`). In dev, Vite proxies `/api` to Flask on :5000.
 - Game page (`russianJiangi.jsx`) is a 2-player board game using **polling** on `/api/game/state/:id` (`syncGameState`) plus form-encoded create/join/move. No websockets/sse — don't invent real-time channels.
 - `vite-plugin-neon-new` (Postgres plugin) is wired in `vite.config.js` with a fixed `referrer`; don't remove it or the Neon piece of the dev setup breaks.
+- Vercel deploys as **Services** (`vite-project/vercel.json`): the top-level config owns all public routing, and "routing into a service is final" (no fallback to other rewrites). The SPA fallback `/(.*)` → `/index.html` must be declared **inside the `my_frontend` service**; a rewrite only in `frontend/vercel.json` is ignored, so refreshing `/mathApp` (etc.) 404s.

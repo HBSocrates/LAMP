@@ -146,7 +146,25 @@ Backend changes are verified manually against a running Flask server.
 - `my_frontend` — root `frontend/`
 - `my_backend` — root `api/`, entrypoint `app:app`
 
-with rewrites: `/api/(.*)` → the backend service, `/(.*)` → the frontend. `frontend/vercel.json` additionally provides the SPA catch-all rewrite to `/`. Set the env vars above in the Vercel project settings for production.
+with top-level rewrites: `/api/(.*)` → the backend service, `/(.*)` → the frontend service. Set the env vars above in the Vercel project settings for production.
+
+### SPA routing (important)
+
+Because this project deploys as **Vercel Services**, the top-level `vite-project/vercel.json` owns *all* public routing, and "routing into a service is final" — if a request doesn't match anything inside the frontend service, that service returns its own 404 rather than falling back. So a deep link/refresh like `/mathApp` would 404 unless the frontend service itself has an SPA fallback.
+
+The fallback is therefore declared **inside the `my_frontend` service** in `vite-project/vercel.json`:
+
+```json
+"my_frontend": {
+  "root": "frontend/",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
+```
+
+This serves `index.html` for any path that isn't a real static asset (assets are served from the filesystem first), letting `react-router-dom` handle the route client-side. `frontend/vercel.json` keeps the same fallback for when the frontend is deployed as a standalone static project.
+
 
 ## External services used
 

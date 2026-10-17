@@ -18,7 +18,7 @@ Vite dev server :5173 ── proxy /api/* ──▶ Flask :5000 ──▶ Neon P
 - **Frontend**: `vite-project/frontend/` — React 19 + Vite 7 SPA, `react-router-dom` v7.
 - **Backend**: `vite-project/api/` — Flask 3, single-file `app.py` (routes + models + game/YouTube logic), Flask-SQLAlchemy, Flask-Migrate, Flask-CORS.
 - **Database**: Neon **PostgreSQL** (never SQLite — password hashing uses the Postgres `pgcrypto` extension: `func.crypt` / `func.gen_salt`).
-- **Deployment**: Vercel, two services (`frontend/` and `api/`) wired by `vercel.json` with `/api/*` rewrites.
+- **Deployment**: Vercel, two services (`frontend/` and `api/`) wired by `vercel.json` with `/api/*` rewrites. Because routing into a service is final, the frontend's SPA fallback (`/(.*)` → `/index.html`) lives inside the `my_frontend` service in the top-level `vercel.json`, not only in `frontend/vercel.json`.
 
 ## Frontend
 

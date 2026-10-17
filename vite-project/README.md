@@ -168,3 +168,4 @@ There is currently **no automated test suite**; `npm run build` and `npm run lin
 - Game updates use **polling** on `/api/game/state/:id` — there are no websockets or SSE.
 - Keep `vite-plugin-neon-new` wired in `vite.config.js`; removing it breaks the Neon piece of the dev setup.
 - Vercel deployment is split into two services (`frontend/` and `api/`) with `/api/*` rewrites, see `vercel.json`.
+- The frontend is a SPA and must have an SPA fallback (`/(.*)` → `/index.html`) or refreshing a route like `/mathApp` 404s. Because the project deploys as **Vercel Services**, top-level `vercel.json` owns all routing and routing into a service is final, so this fallback is declared **inside the `my_frontend` service**, not only in `frontend/vercel.json`.
