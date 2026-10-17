@@ -27,9 +27,22 @@ const YouTubeGuide = () => {
                 body: new URLSearchParams({ url }),
             });
 
-            const data = await response.json();
+            const raw = await response.text();
+            let data = {};
+            if (raw) {
+                try {
+                    data = JSON.parse(raw);
+                } catch {
+                    throw new Error(
+                        response.ok
+                            ? 'Received an unexpected response from the server.'
+                            : `Server error (${response.status}). Make sure the Flask API is running and its dependencies are installed.`,
+                    );
+                }
+            }
+
             if (!response.ok) {
-                throw new Error(data.message || 'Failed to generate a guide.');
+                throw new Error(data.message || `Request failed (${response.status}).`);
             }
             setGuide(data);
         } catch (err) {

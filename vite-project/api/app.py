@@ -415,6 +415,7 @@ def fetch_youtube_title(video_id):
 def fetch_youtube_transcript(video_id):
     from youtube_transcript_api import YouTubeTranscriptApi
     from youtube_transcript_api._errors import (
+        CouldNotRetrieveTranscript,
         NoTranscriptFound,
         TranscriptsDisabled,
         VideoUnavailable,
@@ -428,6 +429,8 @@ def fetch_youtube_transcript(video_id):
         raise ValueError('Transcripts are disabled for this video.')
     except VideoUnavailable:
         raise ValueError('This video is unavailable.')
+    except CouldNotRetrieveTranscript as error:
+        raise ValueError(f'Could not retrieve the transcript: {error}')
 
     try:
         transcript = transcript_list.find_transcript(['en'])
@@ -439,8 +442,14 @@ def fetch_youtube_transcript(video_id):
 
     try:
         fetched = transcript.fetch()
-    except (TranscriptsDisabled, VideoUnavailable, NoTranscriptFound):
+    except TranscriptsDisabled:
+        raise ValueError('Transcripts are disabled for this video.')
+    except VideoUnavailable:
+        raise ValueError('This video is unavailable.')
+    except NoTranscriptFound:
         raise ValueError('This video does not have a transcript available.')
+    except CouldNotRetrieveTranscript as error:
+        raise ValueError(f'Could not retrieve the transcript: {error}')
 
     noise_pattern = re.compile(r'^[\[\(].*[\]\)]$')
     segments = [
@@ -513,6 +522,9 @@ def youtube_guide():
     except requests.RequestException as error:
         print('YouTube guide request error:', error, file=sys.stderr)
         return jsonify({'message': 'Could not reach YouTube. Please try again.'}), 502
+    except Exception as error:
+        print('YouTube guide unexpected error:', repr(error), file=sys.stderr)
+        return jsonify({'message': f'Could not generate a guide: {error}'}), 500
 
     steps = build_step_guide(segments)
     transcript = ' '.join(segment['text'] for segment in segments)
