@@ -37,6 +37,9 @@ const Navbar = () => {
                     <NavLink to="/youtubeGuide">
                         YouTube T2G
                     </NavLink>
+                    <NavLink to="/pathfinder">
+                        Pathfinder 1e
+                    </NavLink>
                     <NavLink to="/about" >
                         About Me
                     </NavLink>
@@ -72,6 +75,9 @@ const Navbar = () => {
                     </MobileNavLink>
                     <MobileNavLink to="/youtubeGuide" onClick={closeMobile}>
                         YouTube T2G
+                    </MobileNavLink>
+                    <MobileNavLink to="/pathfinder" onClick={closeMobile}>
+                        Pathfinder 1e
                     </MobileNavLink>
                     <MobileNavLink to="/about" onClick={closeMobile}>
                         About Me

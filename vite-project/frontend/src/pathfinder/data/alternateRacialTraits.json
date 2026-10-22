@@ -1,0 +1,1097 @@
+{
+  "aasimar": [
+    {
+      "name": "Celestial Resistance",
+      "pages": [
+        "1"
+      ]
+    },
+    {
+      "name": "Celestial Resistance, Skilled",
+      "pages": [
+        "2"
+      ]
+    },
+    {
+      "name": "Darkvision",
+      "pages": [
+        "3"
+      ]
+    },
+    {
+      "name": "Languages, Native Outsider",
+      "pages": [
+        "4"
+      ]
+    },
+    {
+      "name": "Skilled",
+      "pages": [
+        "5"
+      ]
+    },
+    {
+      "name": "Skilled, Spell-Like Ability",
+      "pages": [
+        "6",
+        "7",
+        "8"
+      ]
+    },
+    {
+      "name": "Spell-Like Ability",
+      "pages": [
+        "9",
+        "10",
+        "11"
+      ]
+    }
+  ],
+  "dhampir": [
+    {
+      "name": "Manipulative",
+      "pages": [
+        "25",
+        "26"
+      ]
+    },
+    {
+      "name": "Spell-Like Ability",
+      "pages": [
+        "27",
+        "28",
+        "29"
+      ]
+    }
+  ],
+  "dwarf": [
+    {
+      "name": "Darkvision",
+      "pages": [
+        "57",
+        "58",
+        "59"
+      ]
+    },
+    {
+      "name": "Darkvision, Hatred",
+      "pages": [
+        "568"
+      ]
+    },
+    {
+      "name": "Defensive Training",
+      "pages": [
+        "61",
+        "62"
+      ]
+    },
+    {
+      "name": "Defensive Training, Hardy",
+      "pages": [
+        "34"
+      ]
+    },
+    {
+      "name": "Defensive Training, Hatred",
+      "pages": [
+        "63",
+        "64",
+        "65",
+        "66",
+        "67",
+        "68",
+        "69"
+      ]
+    },
+    {
+      "name": "Defensive Training, Hatred, Stonecunning",
+      "pages": [
+        "70",
+        "71",
+        "72",
+        "73"
+      ]
+    },
+    {
+      "name": "Greed",
+      "pages": [
+        "74",
+        "75",
+        "76"
+      ]
+    },
+    {
+      "name": "Greed, Hardy",
+      "pages": [
+        "77"
+      ]
+    },
+    {
+      "name": "Greed, Hardy, Hatred",
+      "pages": [
+        "78"
+      ]
+    },
+    {
+      "name": "Greed, Hatred, Stonecunning, Weapon Familiarity",
+      "pages": [
+        "79"
+      ]
+    },
+    {
+      "name": "Greed, Stonecunning",
+      "pages": [
+        "80",
+        "81"
+      ]
+    },
+    {
+      "name": "Hardy",
+      "pages": [
+        "82",
+        "83",
+        "84",
+        "85",
+        "86",
+        "87"
+      ]
+    },
+    {
+      "name": "Hatred",
+      "pages": [
+        "88",
+        "89",
+        "90",
+        "91",
+        "92"
+      ]
+    },
+    {
+      "name": "Languages",
+      "pages": [
+        "93"
+      ]
+    },
+    {
+      "name": "Stability",
+      "pages": [
+        "94",
+        "95"
+      ]
+    },
+    {
+      "name": "Stability, Stonecunning",
+      "pages": [
+        "96",
+        "97"
+      ]
+    },
+    {
+      "name": "Stonecunning",
+      "pages": [
+        "98",
+        "99",
+        "100",
+        "101",
+        "102",
+        "103",
+        "104",
+        "45"
+      ]
+    },
+    {
+      "name": "Weapon Familiarity",
+      "pages": [
+        "105"
+      ]
+    }
+  ],
+  "elf": [
+    {
+      "name": "Elven Immunities",
+      "pages": [
+        "106",
+        "107",
+        "108",
+        "109",
+        "110"
+      ]
+    },
+    {
+      "name": "Elven Immunities, Elven Magic",
+      "pages": [
+        "111",
+        "112"
+      ]
+    },
+    {
+      "name": "Elven Immunities, Keen Senses",
+      "pages": [
+        "113",
+        "114"
+      ]
+    },
+    {
+      "name": "Elven Magic",
+      "pages": [
+        "115",
+        "116",
+        "117",
+        "118",
+        "119",
+        "120",
+        "121",
+        "122",
+        "123",
+        "124",
+        "125",
+        "126",
+        "127"
+      ]
+    },
+    {
+      "name": "Elven Magic, Keen Senses",
+      "pages": [
+        "128",
+        "129",
+        "130"
+      ]
+    },
+    {
+      "name": "Elven Magic, Weapon Familiarity",
+      "pages": [
+        "131",
+        "132",
+        "133",
+        "134",
+        "34",
+        "135"
+      ]
+    },
+    {
+      "name": "Keen Senses",
+      "pages": [
+        "136",
+        "137",
+        "60",
+        "81",
+        "138",
+        "139",
+        "140"
+      ]
+    },
+    {
+      "name": "Keen Senses, Weapon Familiarity",
+      "pages": [
+        "141"
+      ]
+    },
+    {
+      "name": "Languages",
+      "pages": [
+        "142",
+        "143"
+      ]
+    },
+    {
+      "name": "Low-Light Vision",
+      "pages": [
+        "99",
+        "144"
+      ]
+    },
+    {
+      "name": "Weapon Familiarity",
+      "pages": [
+        "145",
+        "146",
+        "147",
+        "80",
+        "89",
+        "148",
+        "149",
+        "105",
+        "45"
+      ]
+    }
+  ],
+  "halfling": [
+    {
+      "name": "Fearless",
+      "pages": [
+        "192",
+        "193",
+        "89",
+        "194",
+        "195"
+      ]
+    },
+    {
+      "name": "Fearless, Halfling Luck",
+      "pages": [
+        "196",
+        "197"
+      ]
+    },
+    {
+      "name": "Fearless, Keen Senses",
+      "pages": [
+        "198"
+      ]
+    },
+    {
+      "name": "Fearless, Sure-Footed",
+      "pages": [
+        "199"
+      ]
+    },
+    {
+      "name": "Fearless, Weapon Familiarity",
+      "pages": [
+        "200",
+        "201",
+        "202"
+      ]
+    },
+    {
+      "name": "Halfling Luck",
+      "pages": [
+        "203",
+        "204",
+        "205",
+        "206",
+        "207"
+      ]
+    },
+    {
+      "name": "Halfling Luck, Keen Senses",
+      "pages": [
+        "208"
+      ]
+    },
+    {
+      "name": "Halfling Luck, Sure-Footed, Weapon Familiarity",
+      "pages": [
+        "209"
+      ]
+    },
+    {
+      "name": "Keen Senses",
+      "pages": [
+        "210",
+        "211",
+        "212",
+        "60",
+        "81",
+        "213"
+      ]
+    },
+    {
+      "name": "Keen Senses, Language",
+      "pages": [
+        "214"
+      ]
+    },
+    {
+      "name": "Keen Senses, Sure-Footed",
+      "pages": [
+        "215",
+        "216",
+        "217"
+      ]
+    },
+    {
+      "name": "Slow Speed, Sure-Footed",
+      "pages": [
+        "218"
+      ]
+    },
+    {
+      "name": "Sure-Footed",
+      "pages": [
+        "219",
+        "220",
+        "221",
+        "222",
+        "223",
+        "224",
+        "225",
+        "226"
+      ]
+    },
+    {
+      "name": "Language, Sure-Footed, Weapon Familiarity",
+      "pages": [
+        "227"
+      ]
+    },
+    {
+      "name": "Sure-Footed, Weapon Familiarity",
+      "pages": [
+        "228"
+      ]
+    },
+    {
+      "name": "Weapon Familiarity",
+      "pages": [
+        "99",
+        "80",
+        "105",
+        "76"
+      ]
+    }
+  ],
+  "human": [
+    {
+      "name": "+2 to One Ability Score, Bonus Feat, Skilled",
+      "pages": [
+        "239"
+      ]
+    },
+    {
+      "name": "Bonus Feat",
+      "pages": [
+        "240",
+        "241",
+        "242",
+        "243",
+        "244",
+        "245",
+        "246",
+        "247",
+        "248",
+        "249",
+        "250",
+        "251",
+        "252",
+        "253",
+        "254",
+        "255"
+      ]
+    },
+    {
+      "name": "Languages",
+      "pages": [
+        "256"
+      ]
+    },
+    {
+      "name": "Skilled",
+      "pages": [
+        "257",
+        "258",
+        "80",
+        "260",
+        "261",
+        "262",
+        "263",
+        "264",
+        "265",
+        "266",
+        "267",
+        "268",
+        "269",
+        "270",
+        "271",
+        "272",
+        "273",
+        "274",
+        "275",
+        "276",
+        "34",
+        "277",
+        "278",
+        "279",
+        "280"
+      ]
+    }
+  ],
+  "ifrit": [
+    {
+      "name": "Energy Resistance",
+      "pages": [
+        "281"
+      ]
+    },
+    {
+      "name": "Energy Resistance, Spell-Like Ability",
+      "pages": [
+        "282"
+      ]
+    },
+    {
+      "name": "Fire Affinity",
+      "pages": [
+        "283",
+        "284",
+        "285",
+        "286",
+        "287"
+      ]
+    },
+    {
+      "name": "Languages, Subtype, Type",
+      "pages": [
+        "288"
+      ]
+    },
+    {
+      "name": "Spell-Like Ability",
+      "pages": [
+        "289",
+        "290"
+      ]
+    }
+  ],
+  "kitsune": [
+    {
+      "name": "Ability Score Modifiers",
+      "pages": [
+        "291"
+      ]
+    },
+    {
+      "name": "Agile",
+      "pages": [
+        "292"
+      ]
+    },
+    {
+      "name": "Agile, Kitsune Magic",
+      "pages": [
+        "293"
+      ]
+    },
+    {
+      "name": "Agile, Languages",
+      "pages": [
+        "294"
+      ]
+    },
+    {
+      "name": "Kitsune Magic",
+      "pages": [
+        "295",
+        "296",
+        "297"
+      ]
+    }
+  ],
+  "nagaji": [
+    {
+      "name": "Resistant",
+      "pages": [
+        "323"
+      ]
+    },
+    {
+      "name": "Serpent's Sense",
+      "pages": [
+        "324"
+      ]
+    }
+  ],
+  "fetchling": [
+    {
+      "name": "Low-Light Vision, Spell-Like Abilities",
+      "pages": [
+        "333"
+      ]
+    },
+    {
+      "name": "Shadow Blending",
+      "pages": [
+        "334"
+      ]
+    },
+    {
+      "name": "Shadow Blending, Shadowy Resistance",
+      "pages": [
+        "335"
+      ]
+    },
+    {
+      "name": "Skilled",
+      "pages": [
+        "336",
+        "337",
+        "338",
+        "339",
+        "340",
+        "341"
+      ]
+    },
+    {
+      "name": "Spell-Like Abilities",
+      "pages": [
+        "342",
+        "343",
+        "344",
+        "345"
+      ]
+    }
+  ],
+  "gathlain": [
+    {
+      "name": "Feather Step Spell-Like Ability",
+      "pages": [
+        "346"
+      ]
+    },
+    {
+      "name": "Base Speed",
+      "pages": [
+        "347"
+      ]
+    },
+    {
+      "name": "Constitution Penalty, Speed",
+      "pages": [
+        "348"
+      ]
+    },
+    {
+      "name": "Low-Light Vision",
+      "pages": [
+        "349"
+      ]
+    },
+    {
+      "name": "Natural Armor",
+      "pages": [
+        "350",
+        "351",
+        "352",
+        "353"
+      ]
+    },
+    {
+      "name": "Natural Armor, Spell-Like Ability",
+      "pages": [
+        "354"
+      ]
+    },
+    {
+      "name": "Racial Fly Speed",
+      "pages": [
+        "355",
+        "356"
+      ]
+    },
+    {
+      "name": "Spell-Like Abilities",
+      "pages": [
+        "357",
+        "358",
+        "359",
+        "360",
+        "361",
+        "362",
+        "363"
+      ]
+    }
+  ],
+  "ghoran": [
+    {
+      "name": "Delicious, Past-Life Knowledge",
+      "pages": [
+        "364"
+      ]
+    },
+    {
+      "name": "Natural Armor",
+      "pages": [
+        "365"
+      ]
+    },
+    {
+      "name": "Natural Magic",
+      "pages": [
+        "366"
+      ]
+    },
+    {
+      "name": "Past-Life Knowledge",
+      "pages": [
+        "367",
+        "368"
+      ]
+    },
+    {
+      "name": "Past-Life Knowledge, Nature Magic",
+      "pages": [
+        "369",
+        "370"
+      ]
+    },
+    {
+      "name": "Past-Life Knowledge; Nature Magic",
+      "pages": [
+        "371"
+      ]
+    },
+    {
+      "name": "Seed; Nature Magic",
+      "pages": [
+        "372"
+      ]
+    }
+  ],
+  "gnome": [
+    {
+      "name": "Defensive Training, Gnome Magic, Illusion Resistance",
+      "pages": [
+        "34"
+      ]
+    },
+    {
+      "name": "Defensive Training, Hatred",
+      "pages": [
+        "381",
+        "382",
+        "383",
+        "384",
+        "385",
+        "386"
+      ]
+    },
+    {
+      "name": "Defensive Training, Hatred, Keen Senses",
+      "pages": [
+        "387",
+        "388"
+      ]
+    },
+    {
+      "name": "Defensive Training, Hatred, Obsessive",
+      "pages": [
+        "389"
+      ]
+    },
+    {
+      "name": "Defensive Training, Illusion Resistance",
+      "pages": [
+        "390"
+      ]
+    },
+    {
+      "name": "Gnome Magic",
+      "pages": [
+        "391",
+        "392",
+        "393",
+        "394",
+        "395",
+        "76",
+        "396"
+      ]
+    },
+    {
+      "name": "Gnome Magic, Illusion Resistance",
+      "pages": [
+        "397",
+        "398"
+      ]
+    },
+    {
+      "name": "Gnome Magic, Illusion Resistance, Obsessive",
+      "pages": [
+        "399"
+      ]
+    },
+    {
+      "name": "Gnome Magic, Keen Senses",
+      "pages": [
+        "400"
+      ]
+    },
+    {
+      "name": "Gnome Magic, Obsessive",
+      "pages": [
+        "401"
+      ]
+    },
+    {
+      "name": "Hatred, Obsessive",
+      "pages": [
+        "402",
+        "403"
+      ]
+    },
+    {
+      "name": "Illusion Resistance, Keen Senses, Obsessive",
+      "pages": [
+        "404"
+      ]
+    },
+    {
+      "name": "Illusion Resistance, Obsessive",
+      "pages": [
+        "405"
+      ]
+    },
+    {
+      "name": "Keen Senses",
+      "pages": [
+        "136",
+        "60",
+        "406"
+      ]
+    },
+    {
+      "name": "Keen Senses, Obsessive",
+      "pages": [
+        "407",
+        "408"
+      ]
+    },
+    {
+      "name": "Low-Light Vision",
+      "pages": [
+        "99"
+      ]
+    },
+    {
+      "name": "Low-Light Vision, Keen Senses",
+      "pages": [
+        "409"
+      ]
+    },
+    {
+      "name": "Obsessive",
+      "pages": [
+        "410",
+        "411",
+        "412",
+        "413",
+        "414"
+      ]
+    },
+    {
+      "name": "Weapon Familiarity",
+      "pages": [
+        "80",
+        "415",
+        "89",
+        "105",
+        "416"
+      ]
+    }
+  ],
+  "strix": [
+    {
+      "name": "Hatred, Suspicious",
+      "pages": [
+        "492"
+      ]
+    },
+    {
+      "name": "Nocturnal",
+      "pages": [
+        "493",
+        "494"
+      ]
+    },
+    {
+      "name": "Normal Speed",
+      "pages": [
+        "495"
+      ]
+    },
+    {
+      "name": "Suspicious",
+      "pages": [
+        "496",
+        "497"
+      ]
+    }
+  ],
+  "suli": [
+    {
+      "name": "Elemental Assault",
+      "pages": [
+        "498"
+      ]
+    },
+    {
+      "name": "Energy Resistance, Low-Light Vision",
+      "pages": [
+        "499"
+      ]
+    },
+    {
+      "name": "Languages, Subtype, Type",
+      "pages": [
+        "288"
+      ]
+    }
+  ],
+  "sylph": [
+    {
+      "name": "Air Affinity",
+      "pages": [
+        "503",
+        "504",
+        "505"
+      ]
+    },
+    {
+      "name": "Energy Resistance",
+      "pages": [
+        "506",
+        "507"
+      ]
+    },
+    {
+      "name": "Energy Resistance, Spell-Like Ability",
+      "pages": [
+        "508"
+      ]
+    },
+    {
+      "name": "Languages, Subtype, Type",
+      "pages": [
+        "288"
+      ]
+    },
+    {
+      "name": "Spell-Like Ability",
+      "pages": [
+        "509",
+        "510",
+        "511"
+      ]
+    }
+  ],
+  "tiefling": [
+    {
+      "name": "Fiendish Resistance",
+      "pages": [
+        "517"
+      ]
+    },
+    {
+      "name": "Fiendish Sorcery",
+      "pages": [
+        "518"
+      ]
+    },
+    {
+      "name": "Fiendish Sorcery, Spell-Like Ability",
+      "pages": [
+        "519"
+      ]
+    },
+    {
+      "name": "Languages, Subtype, Type",
+      "pages": [
+        "520"
+      ]
+    },
+    {
+      "name": "Skilled",
+      "pages": [
+        "521",
+        "522",
+        "523",
+        "524"
+      ]
+    },
+    {
+      "name": "Spell-Like Ability",
+      "pages": [
+        "35",
+        "525",
+        "526",
+        "527"
+      ]
+    },
+    {
+      "name": "Spell-Like Ability, Fiendish Sorcery",
+      "pages": [
+        "528"
+      ]
+    }
+  ],
+  "undine": [
+    {
+      "name": "Darkvision",
+      "pages": [
+        "529"
+      ]
+    },
+    {
+      "name": "Energy Resistance",
+      "pages": [
+        "530",
+        "531",
+        "532"
+      ]
+    },
+    {
+      "name": "Languages, Subtype, Type",
+      "pages": [
+        "288"
+      ]
+    },
+    {
+      "name": "Spell-Like Ability",
+      "pages": [
+        "533",
+        "534",
+        "535",
+        "536",
+        "537"
+      ]
+    },
+    {
+      "name": "Water Affinity",
+      "pages": [
+        "538"
+      ]
+    }
+  ],
+  "vanara": [
+    {
+      "name": "Nimble",
+      "pages": [
+        "539",
+        "540"
+      ]
+    },
+    {
+      "name": "Natural Climber",
+      "pages": [
+        "541"
+      ]
+    },
+    {
+      "name": "Prehensile Tail",
+      "pages": [
+        "542",
+        "543"
+      ]
+    }
+  ],
+  "vishkanya": [
+    {
+      "name": "Escape Artist Racial Bonus",
+      "pages": [
+        "552"
+      ]
+    },
+    {
+      "name": "Keen Senses",
+      "pages": [
+        "553"
+      ]
+    },
+    {
+      "name": "Low-Light Vision",
+      "pages": [
+        "554"
+      ]
+    }
+  ]
+}

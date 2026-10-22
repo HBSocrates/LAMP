@@ -76,6 +76,24 @@ class Game(db.Model):
     def __repr__(self):
         return f'<Game {self.id} status={self.status}>'
 
+
+class PathfinderCharacter(db.Model):
+    __tablename__ = 'pathfinder_characters'
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), nullable=False, index=True)
+    name = db.Column(db.String(200), nullable=False)
+    data = db.Column(JSON, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.datetime.utcnow,
+        onupdate=datetime.datetime.utcnow,
+    )
+
+    def __repr__(self):
+        return f'<PathfinderCharacter {self.id} {self.name}>'
+
 # --- Game Logic Helpers ---
 
 def get_size_value(size):
@@ -537,4 +555,121 @@ def youtube_guide():
         'steps': steps,
         'transcript': transcript,
     })
+
+
+# --- Pathfinder 1e Character Builder ---
+
+MAX_CHARACTER_PAYLOAD = 1024 * 1024
+
+
+def _character_summary(character):
+    data = character.data or {}
+    classes = data.get('classes') or []
+    class_names = []
+    total_level = 0
+    for entry in classes:
+        if isinstance(entry, dict):
+            class_names.append(entry.get('classId') or 'Unknown')
+            try:
+                total_level += int(entry.get('level') or 0)
+            except (TypeError, ValueError):
+                pass
+        else:
+            class_names.append('Unknown')
+    return {
+        'id': character.id,
+        'name': character.name,
+        'username': character.username,
+        'race': (data.get('identity') or {}).get('raceId') or '',
+        'classes': ', '.join(class_names),
+        'total_level': total_level,
+        'updated_at': character.updated_at.isoformat() if character.updated_at else None,
+    }
+
+
+@app.route('/api/pathfinder/characters', methods=['GET'])
+def list_pathfinder_characters():
+    username = request.args.get('username')
+    if not username:
+        return jsonify({'message': 'Username is required'}), 400
+    characters = db.session.execute(
+        db.select(PathfinderCharacter).filter_by(username=username)
+    ).scalars().all()
+    return jsonify({'characters': [_character_summary(character) for character in characters]})
+
+
+@app.route('/api/pathfinder/characters/<int:character_id>', methods=['GET'])
+def get_pathfinder_character(character_id):
+    username = request.args.get('username')
+    if not username:
+        return jsonify({'message': 'Username is required'}), 400
+    character = db.session.get(PathfinderCharacter, character_id)
+    if not character or character.username != username:
+        return jsonify({'message': 'Character not found'}), 404
+    return jsonify({
+        'id': character.id,
+        'name': character.name,
+        'character': {'data': character.data},
+        'created_at': character.created_at.isoformat() if character.created_at else None,
+        'updated_at': character.updated_at.isoformat() if character.updated_at else None,
+    })
+
+
+@app.route('/api/pathfinder/characters', methods=['POST'])
+def create_pathfinder_character():
+    username = request.form.get('username')
+    name = request.form.get('name') or 'Unnamed Character'
+    data = request.form.get('data')
+    if not username or not data:
+        return jsonify({'message': 'Username and character data are required'}), 400
+    if len(data.encode('utf-8')) > MAX_CHARACTER_PAYLOAD:
+        return jsonify({'message': 'Character data is too large'}), 413
+    try:
+        parsed = json.loads(data)
+    except json.JSONDecodeError:
+        return jsonify({'message': 'Character data must be valid JSON'}), 400
+    if not isinstance(parsed, dict):
+        return jsonify({'message': 'Character data must be a JSON object'}), 400
+    character = PathfinderCharacter(username=username, name=name[:200], data=parsed)
+    db.session.add(character)
+    db.session.commit()
+    return jsonify({'id': character.id, 'message': 'Character created'})
+
+
+@app.route('/api/pathfinder/characters/<int:character_id>', methods=['POST'])
+def update_pathfinder_character(character_id):
+    username = request.form.get('username')
+    name = request.form.get('name')
+    data = request.form.get('data')
+    if not username or not data:
+        return jsonify({'message': 'Username and character data are required'}), 400
+    if len(data.encode('utf-8')) > MAX_CHARACTER_PAYLOAD:
+        return jsonify({'message': 'Character data is too large'}), 413
+    character = db.session.get(PathfinderCharacter, character_id)
+    if not character or character.username != username:
+        return jsonify({'message': 'Character not found'}), 404
+    try:
+        parsed = json.loads(data)
+    except json.JSONDecodeError:
+        return jsonify({'message': 'Character data must be valid JSON'}), 400
+    if not isinstance(parsed, dict):
+        return jsonify({'message': 'Character data must be a JSON object'}), 400
+    character.name = (name or character.name)[:200]
+    character.data = parsed
+    character.updated_at = datetime.datetime.utcnow()
+    db.session.commit()
+    return jsonify({'id': character.id, 'message': 'Character updated'})
+
+
+@app.route('/api/pathfinder/characters/<int:character_id>/delete', methods=['POST'])
+def delete_pathfinder_character(character_id):
+    username = request.form.get('username')
+    if not username:
+        return jsonify({'message': 'Username is required'}), 400
+    character = db.session.get(PathfinderCharacter, character_id)
+    if not character or character.username != username:
+        return jsonify({'message': 'Character not found'}), 404
+    db.session.delete(character)
+    db.session.commit()
+    return jsonify({'message': 'Character deleted'})
 

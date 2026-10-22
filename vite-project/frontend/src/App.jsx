@@ -14,6 +14,7 @@ import SignUp from "./pages/signUp";
 import Login from "./pages/login";
 import RussianJiangi from "./pages/russianJiangi.jsx";
 import YouTubeGuide from './pages/youtubeGuide.jsx';
+import Pathfinder from "./pages/pathfinder.jsx";
 
 function App() {
 
@@ -26,6 +27,7 @@ function App() {
                 <Route path="/rssFeed" element={<RSSFeed />} />
                 <Route path="/RussianJiangi" element={<RussianJiangi />} />
                 <Route path='/youtubeGuide' element={<YouTubeGuide />} />
+                <Route path="/pathfinder" element={<Pathfinder />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/signUp" element={<SignUp />} />
                 <Route path="/login" element={<Login />} />
