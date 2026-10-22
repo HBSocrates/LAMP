@@ -55,7 +55,7 @@ Include:
 
 ## v2 TODO
 
-- Add prestige classes.
+- Add prestige classes. Prerequisites must be hard-blocked like feats, not warn-only. Note: current sources (Foundry PF1 packs, jasontank JSON) contain no prestige class definitions, so a data source must be chosen/curated first.
 - Add variant multiclassing.
 - Revisit third-party Ultimate-line content only if explicitly requested.
 - Keep favored class bonuses excluded unless requested later.
